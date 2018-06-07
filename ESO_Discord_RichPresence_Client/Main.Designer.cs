@@ -38,12 +38,15 @@
             // Box_Enabled
             // 
             this.Box_Enabled.AutoSize = true;
+            this.Box_Enabled.Checked = true;
+            this.Box_Enabled.CheckState = System.Windows.Forms.CheckState.Checked;
             this.Box_Enabled.Location = new System.Drawing.Point(25, 27);
             this.Box_Enabled.Name = "Box_Enabled";
             this.Box_Enabled.Size = new System.Drawing.Size(65, 17);
             this.Box_Enabled.TabIndex = 0;
             this.Box_Enabled.Text = "Enabled";
             this.Box_Enabled.UseVisualStyleBackColor = true;
+            this.Box_Enabled.CheckedChanged += new System.EventHandler(this.Box_Enabled_CheckedChanged);
             // 
             // FolderBrowser
             // 
@@ -52,22 +55,28 @@
             // Box_CharacterName
             // 
             this.Box_CharacterName.AutoSize = true;
+            this.Box_CharacterName.Checked = true;
+            this.Box_CharacterName.CheckState = System.Windows.Forms.CheckState.Checked;
             this.Box_CharacterName.Location = new System.Drawing.Point(25, 51);
             this.Box_CharacterName.Name = "Box_CharacterName";
             this.Box_CharacterName.Size = new System.Drawing.Size(125, 17);
             this.Box_CharacterName.TabIndex = 1;
             this.Box_CharacterName.Text = "Use Character Name";
             this.Box_CharacterName.UseVisualStyleBackColor = true;
+            this.Box_CharacterName.CheckedChanged += new System.EventHandler(this.Box_CharacterName_CheckedChanged);
             // 
             // Box_ShowGroup
             // 
             this.Box_ShowGroup.AutoSize = true;
+            this.Box_ShowGroup.Checked = true;
+            this.Box_ShowGroup.CheckState = System.Windows.Forms.CheckState.Checked;
             this.Box_ShowGroup.Location = new System.Drawing.Point(25, 75);
             this.Box_ShowGroup.Name = "Box_ShowGroup";
             this.Box_ShowGroup.Size = new System.Drawing.Size(106, 17);
             this.Box_ShowGroup.TabIndex = 2;
             this.Box_ShowGroup.Text = "Show Group Info";
             this.Box_ShowGroup.UseVisualStyleBackColor = true;
+            this.Box_ShowGroup.CheckedChanged += new System.EventHandler(this.Box_ShowGroup_CheckedChanged);
             // 
             // Main
             // 

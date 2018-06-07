@@ -21,7 +21,6 @@ namespace ESO_Discord_RichPresence_Client
         private readonly FileSystemWatcher _watcher;
 
         public string Path { get; set; } = "";
-        public EsoCharacter CurrentCharacter;
 
         public SavedVariables(Discord client, FolderBrowserDialog browser)
         {
@@ -49,7 +48,7 @@ namespace ESO_Discord_RichPresence_Client
             this.SetupWatcher();
 
             string LuaContents = File.ReadAllText(this.Path);
-            this.CurrentCharacter = SavedVariables.ParseLua(LuaContents);
+            Discord.CurrentCharacter = SavedVariables.ParseLua(LuaContents);
         }
 
         static public EsoCharacter ParseLua(string luaTable)
@@ -175,6 +174,21 @@ namespace ESO_Discord_RichPresence_Client
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             Console.WriteLine("SavedVariables file changed");
+            try
+            {
+                Discord.CurrentCharacter = SavedVariables.ParseLua(File.ReadAllText(e.FullPath));
+                this._client.UpdatePresence(Discord.CurrentCharacter);
+            }
+            
+            catch (System.IO.IOException error)
+            {
+                var errorResponse = MessageBox.Show($"Something happened while updating your game: {error.Message}", "File Read Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+
+                if (errorResponse == DialogResult.Abort)
+                    Environment.Exit(1);
+                else if (errorResponse == DialogResult.Retry)
+                    this.OnChanged(source, e);
+            }
         }
 
         private void OnDeleted(object source, FileSystemEventArgs e)

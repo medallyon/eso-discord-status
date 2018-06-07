@@ -80,8 +80,8 @@ namespace ESO_Discord_RichPresence_Client
                 this.PresenceData.partySize = 0;
             }
 
-            this.PresenceData.largeImageKey = ((character.InDungeon) ? ESO.Dungeons[character.Zone] : "default");
-            this.PresenceData.largeImageText = character.Zone;
+            this.PresenceData.largeImageKey = ((character.InDungeon) ? ESO.Dungeons[character.Zone] : ESO.Zones[character.Zone]);
+            this.PresenceData.largeImageText = ((ESO.Dungeons.Contains(character.Zone) || ESO.Zones.Contains(character.Zone)) ? character.Zone : "Tamriel");
 
             DiscordRpc.UpdatePresence(this.PresenceData);
         }

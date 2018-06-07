@@ -46,7 +46,7 @@ namespace ESO_Discord_RichPresence_Client
         private static string resolve_keyname(string name)
         {
             if (!Names.Any(x => x.ToLower() == name.ToLower()))
-                throw new IndexOutOfRangeException($"{name} is not a Dungeon");
+                return "default";
 
             return "dungeon_" + name.ToLower()
                 .Replace(' ', '_')

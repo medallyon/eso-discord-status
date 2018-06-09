@@ -10,19 +10,39 @@ namespace ESO_Discord_RichPresence_Client
     {
         public static EsoCharacter CurrentCharacter;
 
-        public bool Enabled;
-        public bool ShowCharacterName;
-        public bool ShowGroupInfo;
-
         private string ApplicationID { get; set; }
         private string OptionalSteamAppID { get; set; }
         private int CallbackCalls { get; set; }
 
+        private bool Enabled
+        {
+            get
+            {
+                return this.Main.Settings.Enabled;
+            }
+        }
+        private bool ShowCharacterName
+        {
+            get
+            {
+                return this.Main.Settings.ShowCharacterName;
+            }
+        }
+        private bool ShowPartyInfo
+        {
+            get
+            {
+                return this.Main.Settings.ShowPartyInfo;
+            }
+        }
+
+        internal Main Main;
         public RichPresence PresenceData = new RichPresence();
         private EventHandlers handlers;
 
-        public Discord(string appID)
+        public Discord(Main form, string appID)
         {
+            this.Main = form;
             this.ApplicationID = appID;
 
             this.handlers = new EventHandlers
@@ -32,8 +52,9 @@ namespace ESO_Discord_RichPresence_Client
             };
         }
 
-        public Discord(string appID, string steamAppID)
+        public Discord(Main form, string appID, string steamAppID)
         {
+            this.Main = form;
             this.ApplicationID = appID;
             this.OptionalSteamAppID = steamAppID;
 
@@ -46,7 +67,9 @@ namespace ESO_Discord_RichPresence_Client
 
         public void Enable()
         {
-            Console.WriteLine("Discord: init");
+            if (!this.Main.EsoIsRunning)
+                return;
+
             this.CallbackCalls = 0;
             this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
@@ -55,20 +78,29 @@ namespace ESO_Discord_RichPresence_Client
 
         public void UpdatePresence()
         {
+            if (!this.Main.EsoIsRunning)
+                return;
+
             this.UpdatePresence(Discord.CurrentCharacter);
         }
 
         public new void UpdatePresence(RichPresence data)
         {
+            if (!this.Main.EsoIsRunning)
+                return;
+
             DiscordRpc.UpdatePresence(data);
         }
 
         public void UpdatePresence(EsoCharacter character)
         {
-            this.PresenceData.state = ((character.InDungeon) ? "In a dungeon" : "Roaming Tamriel");
+            if (!this.Main.EsoIsRunning)
+                return;
+            
+            this.PresenceData.state = ((character.InDungeon) ? $"In a dungeon as {character.GroupRole}" : "Roaming Tamriel");
             this.PresenceData.details = $"{((this.ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
 
-            if (this.ShowGroupInfo)
+            if (this.ShowPartyInfo)
             {
                 this.PresenceData.partyMax = ((character.GroupSize <= 4) ? 4 : ((character.GroupSize <= 12) ? 12 : 24));
                 this.PresenceData.partySize = character.GroupSize;
@@ -105,7 +137,6 @@ namespace ESO_Discord_RichPresence_Client
 
         public void Disable()
         {
-            Console.WriteLine("Discord: shutdown");
             Shutdown();
         }
     }

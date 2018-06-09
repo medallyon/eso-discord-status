@@ -16,34 +16,33 @@ namespace ESO_Discord_RichPresence_Client
         static public string esoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\\Documents\\Elder Scrolls Online");
         static public string Dir = $@"{esoDir}\\live\\SavedVariables";
 
+        internal readonly Main Main;
         private readonly Discord _client;
         private readonly FolderBrowserDialog _browser;
         private readonly FileSystemWatcher _watcher;
 
         public string Path { get; set; } = "";
 
-        public SavedVariables(Discord client, FolderBrowserDialog browser)
+        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
         {
+            this.Main = form;
             this._client = client;
             this._browser = browser;
             this._watcher = new FileSystemWatcher();
-
-            this.Initialise();
         }
 
-        public SavedVariables(Discord client, FolderBrowserDialog browser, string savedVarsPath)
+        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser, string savedVarsPath)
         {
+            this.Main = form;
             this._client = client;
             this._browser = browser;
             this._watcher = new FileSystemWatcher();
             this.Path = savedVarsPath;
-
-            this.Initialise();
         }
 
-        private void Initialise()
+        public void Initialise()
         {
-            this.CheckCustomPathExists();
+            this.Path = this.Main.Settings.CustomEsoLocation;
             this.EnsureSavedVarsExist();
             this.SetupWatcher();
 
@@ -84,24 +83,12 @@ namespace ESO_Discord_RichPresence_Client
             return new EsoCharacter((LuaTable)Accounts.Values.First()["$AccountWide"]);
         }
 
-        public void CheckCustomPathExists()
-        {
-            if (!File.Exists($@"{SavedVariables.CustomPathSaveDirectory}\\CustomEsoPath.txt"))
-                return;
-
-            SavedVariables.esoDir = File.ReadAllText($@"{SavedVariables.CustomPathSaveDirectory}\\CustomEsoPath.txt");
-            SavedVariables.Dir = $@"{SavedVariables.esoDir}\\live\\SavedVariables";
-        }
-
         public void EnsureSavedVarsExist()
         {
             if (this.Path.Length > 0)
             {
-                if (!File.Exists(this.Path))
-                {
-                    this.Path = "";
-                    this.EnsureSavedVarsExist();
-                }
+                SavedVariables.esoDir = this.Path;
+                SavedVariables.Dir = $@"{this.Path}\\live\\SavedVariables";
             }
 
             // "Elder Scrolls Online" doesn't exist in "My Documents"
@@ -116,7 +103,8 @@ namespace ESO_Discord_RichPresence_Client
                         SavedVariables.esoDir = this._browser.SelectedPath;
                         SavedVariables.Dir = $@"{SavedVariables.esoDir}\\live\\SavedVariables";
 
-                        SavedVariables.SaveCustomPath(SavedVariables.esoDir);
+                        this.Main.Settings["CustomEsoLocation"] = SavedVariables.esoDir;
+                        this.Main.Settings.SaveToFile();
                     }
 
                     else
@@ -201,14 +189,6 @@ namespace ESO_Discord_RichPresence_Client
         {
             Console.WriteLine("SavedVariables file renamed");
             this.EnsureSavedVarsExist();
-        }
-
-        private static void SaveCustomPath(string path)
-        {
-            if (!Directory.Exists(SavedVariables.CustomPathSaveDirectory))
-                Directory.CreateDirectory(SavedVariables.CustomPathSaveDirectory);
-
-            File.WriteAllText($@"{SavedVariables.CustomPathSaveDirectory}\\CustomEsoPath.txt", path);
         }
     }
 }

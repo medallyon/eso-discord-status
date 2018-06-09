@@ -5,6 +5,7 @@ using System.Linq;
 using NLua;
 using System.Security.Permissions;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -162,12 +163,17 @@ namespace ESO_Discord_RichPresence_Client
         private void OnChanged(object source, FileSystemEventArgs e)
         {
             Console.WriteLine("SavedVariables file changed");
+            
+            // wait 1 second here to avoid conflicts with file being busy
+            Thread.Sleep(1000);
+
             try
             {
-                Discord.CurrentCharacter = SavedVariables.ParseLua(File.ReadAllText(e.FullPath));
+                string LuaCharacter = File.ReadAllText(e.FullPath);
+                Discord.CurrentCharacter = SavedVariables.ParseLua(LuaCharacter);
                 this._client.UpdatePresence(Discord.CurrentCharacter);
             }
-            
+
             catch (System.IO.IOException error)
             {
                 var errorResponse = MessageBox.Show($"Something happened while updating your game: {error.Message}", "File Read Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);

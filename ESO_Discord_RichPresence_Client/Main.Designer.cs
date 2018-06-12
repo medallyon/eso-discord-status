@@ -38,6 +38,7 @@
             this.Label_EsoIsRunning = new System.Windows.Forms.Label();
             this.Box_ToTray = new System.Windows.Forms.CheckBox();
             this.NotifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.Box_AutoStart = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // Box_Enabled
@@ -45,7 +46,7 @@
             this.Box_Enabled.AutoSize = true;
             this.Box_Enabled.Checked = true;
             this.Box_Enabled.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.Box_Enabled.Location = new System.Drawing.Point(25, 72);
+            this.Box_Enabled.Location = new System.Drawing.Point(25, 75);
             this.Box_Enabled.Name = "Box_Enabled";
             this.Box_Enabled.Size = new System.Drawing.Size(65, 17);
             this.Box_Enabled.TabIndex = 0;
@@ -63,7 +64,7 @@
             this.Box_CharacterName.AutoSize = true;
             this.Box_CharacterName.Checked = true;
             this.Box_CharacterName.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.Box_CharacterName.Location = new System.Drawing.Point(25, 95);
+            this.Box_CharacterName.Location = new System.Drawing.Point(25, 98);
             this.Box_CharacterName.Name = "Box_CharacterName";
             this.Box_CharacterName.Size = new System.Drawing.Size(125, 17);
             this.Box_CharacterName.TabIndex = 1;
@@ -117,7 +118,7 @@
             this.Box_ToTray.AutoSize = true;
             this.Box_ToTray.Checked = true;
             this.Box_ToTray.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.Box_ToTray.Location = new System.Drawing.Point(240, 95);
+            this.Box_ToTray.Location = new System.Drawing.Point(240, 98);
             this.Box_ToTray.Name = "Box_ToTray";
             this.Box_ToTray.Size = new System.Drawing.Size(98, 17);
             this.Box_ToTray.TabIndex = 5;
@@ -135,12 +136,26 @@
             this.NotifyIcon1.Text = "Discord Status Updater";
             this.NotifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon1_MouseDoubleClick);
             // 
+            // Box_AutoStart
+            // 
+            this.Box_AutoStart.AutoSize = true;
+            this.Box_AutoStart.Location = new System.Drawing.Point(240, 75);
+            this.Box_AutoStart.Name = "Box_AutoStart";
+            this.Box_AutoStart.Size = new System.Drawing.Size(98, 17);
+            this.Box_AutoStart.TabIndex = 6;
+            this.Box_AutoStart.Text = "Auto Start ESO";
+            this.Box_AutoStart.UseVisualStyleBackColor = true;
+            this.Box_AutoStart.UseWaitCursor = true;
+            this.Box_AutoStart.CheckedChanged += new System.EventHandler(this.Box_AutoStart_CheckedChanged);
+            this.Box_AutoStart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Box_AutoStart_MouseClick);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(62)))));
             this.ClientSize = new System.Drawing.Size(354, 161);
+            this.Controls.Add(this.Box_AutoStart);
             this.Controls.Add(this.Box_ToTray);
             this.Controls.Add(this.Label_EsoIsRunning);
             this.Controls.Add(this.Box_StayTopMost);
@@ -172,6 +187,7 @@
         private System.Windows.Forms.Label Label_EsoIsRunning;
         private System.Windows.Forms.CheckBox Box_ToTray;
         private System.Windows.Forms.NotifyIcon NotifyIcon1;
+        private System.Windows.Forms.CheckBox Box_AutoStart;
     }
 }
 

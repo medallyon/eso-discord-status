@@ -11,6 +11,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace ESO_Discord_RichPresence_Client
 {
@@ -24,6 +25,7 @@ namespace ESO_Discord_RichPresence_Client
         public Settings Settings;
         private SavedVariables SavedVars;
         private Discord DiscordClient;
+        private Form SteamAppIdForm;
 
         public bool EsoIsRunning { get; set; } = false;
 
@@ -42,6 +44,38 @@ namespace ESO_Discord_RichPresence_Client
         {
             this.Text = "ESO Discord Status";
 
+            this.SteamAppIdForm = new Form();
+            this.SteamAppIdForm.Name = "SteamAppIdForm";
+            this.SteamAppIdForm.Hide();
+
+            this.SteamAppIdForm.AutoSize = false;
+            this.SteamAppIdForm.TopLevel = true;
+            this.SteamAppIdForm.ControlBox = false;
+            this.SteamAppIdForm.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.SteamAppIdForm.BackColor = Color.FromArgb(27, 28, 31);
+            this.SteamAppIdForm.ForeColor = this.ForeColor;
+            this.SteamAppIdForm.WindowState = FormWindowState.Normal;
+            this.SteamAppIdForm.MinimumSize = new Size(0, 0);
+            this.SteamAppIdForm.Size = new Size(124, 44);
+            this.SteamAppIdForm.StartPosition = FormStartPosition.Manual;
+            this.SteamAppIdForm.Location = new Point(
+                this.Location.X + this.Width - (this.SteamAppIdForm.Width / 2),
+                this.Location.Y + (this.Height / 2) - (this.SteamAppIdForm.Height / 2)
+            );
+
+            TextBox AppIdTextBox = new TextBox
+            {
+                Name = "SteamIdTextBox",
+                Enabled = true,
+                Size = new Size(120, 40),
+                Location = new Point(2, 2),
+                BorderStyle = BorderStyle.FixedSingle
+            };
+            AppIdTextBox.KeyDown += AppIdTextBox_KeyDown;
+            AppIdTextBox.LostFocus += AppIdTextBox_LostFocus;
+
+            this.SteamAppIdForm.Controls.Add(AppIdTextBox);
+
             this.InitialiseSettings();
             this.SavedVars.Initialise();
 
@@ -55,6 +89,83 @@ namespace ESO_Discord_RichPresence_Client
             this.Box_ShowGroup.Checked = this.Settings.ShowPartyInfo;
             this.Box_ToTray.Checked = this.Settings.ToTray;
             this.Box_StayTopMost.Checked = this.Settings.StayTopMost;
+            this.Box_AutoStart.Checked = this.Settings.AutoStart;
+
+            if (this.Settings.CustomSteamAppID != null)
+                this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = this.Settings.CustomSteamAppID;
+
+            if (this.Settings.AutoStart)
+                this.StartESO();
+        }
+
+        private void StartESO()
+        {
+            if (this.Settings.CustomSteamAppID != null && this.Settings.CustomSteamAppID.Length >= 5)
+            {
+                Process.Start($"steam://rungameid/{this.Settings.CustomSteamAppID}");
+                return;
+            }
+
+            const string SteamBaseKey = "SOFTWARE\\WOW6432Node\\Valve\\Steam";
+            const string EsoBaseKey = "SOFTWARE\\WOW6432Node\\Zenimax_Online\\Launcher";
+
+            RegistryKey SteamRegistryKey = Registry.LocalMachine.OpenSubKey(SteamBaseKey);
+            RegistryKey EsoRegistryKey;
+
+            // Steam is installed
+            if (SteamRegistryKey != null)
+            {
+                string SteamEsoBaseKey = $"{SteamBaseKey}\\Apps\\{Main.ESO_STEAM_APP_ID}";
+                EsoRegistryKey = Registry.LocalMachine.OpenSubKey(SteamEsoBaseKey);
+
+                // ESO is installed through Steam
+                if (EsoRegistryKey != null)
+                {
+                    Process.Start($"steam://rungameid/{Main.ESO_STEAM_APP_ID}");
+                    return;
+                }
+            }
+
+            EsoRegistryKey = Registry.LocalMachine.OpenSubKey(EsoBaseKey);
+            string EsoInstallLocation = String.Empty;
+
+            // ESO cannot be found
+            if (EsoRegistryKey == null)
+            {
+                DialogResult response = MessageBox.Show("ESO could not be found. Please select your ESO folder.", "ESO not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
+
+                if (response == DialogResult.Cancel)
+                    return;
+                else
+                {
+                    if (this.FolderBrowser.ShowDialog() == DialogResult.OK)
+                    {
+                        EsoInstallLocation = this.FolderBrowser.SelectedPath;
+                        this.Settings.CustomEsoInstallLocation = this.FolderBrowser.SelectedPath;
+                        this.Settings.SaveToFile();
+                    }
+
+                    else
+                        return;
+                }
+            }
+
+            // ESO is installed
+            else
+                EsoInstallLocation = (string)EsoRegistryKey.GetValue("InstallPath");
+
+            string EsoLauncherPath = $"{EsoInstallLocation}\\Launcher\\Bethesda.net_Launcher.exe";
+            if (!File.Exists(EsoLauncherPath))
+            {
+                MessageBox.Show("ESO could not be found. Please make sure ESO is installed correctly, then try again.", "ESO not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                return;
+            }
+            
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = EsoLauncherPath,
+                WorkingDirectory = $"{EsoInstallLocation}\\Launcher"
+            });
         }
 
         private void InitEsoTimer()
@@ -168,6 +279,44 @@ namespace ESO_Discord_RichPresence_Client
 
             this.Settings.StayTopMost = this.TopMost;
             this.Settings.SaveToFile();
+        }
+
+        private void Box_AutoStart_CheckedChanged(object sender, EventArgs e)
+        {
+            this.Settings.AutoStart = this.Box_AutoStart.Checked;
+            this.Settings.SaveToFile();
+        }
+
+        private void Box_AutoStart_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+            {
+                this.TopMost = false;
+                this.SteamAppIdForm.Show();
+            }
+        }
+
+        private void AppIdTextBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyData == Keys.Enter)
+            {
+                Control SteamIdTextBox = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
+                this.Settings.CustomSteamAppID = SteamIdTextBox.Text;
+                this.Settings.SaveToFile();
+
+                this.TopMost = this.Settings.StayTopMost;
+                this.SteamAppIdForm.Hide();
+            }
+        }
+
+        private void AppIdTextBox_LostFocus(object sender, EventArgs e)
+        {
+            Control SteamIdTextBox = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
+            this.Settings.CustomSteamAppID = SteamIdTextBox.Text;
+            this.Settings.SaveToFile();
+
+            this.TopMost = this.Settings.StayTopMost;
+            this.SteamAppIdForm.Hide();
         }
     }
 }

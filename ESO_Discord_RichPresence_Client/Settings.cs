@@ -10,16 +10,19 @@ namespace ESO_Discord_RichPresence_Client
     public class Settings : Dictionary<string, object>
     {
         static string SaveLocation = Environment.ExpandEnvironmentVariables("%TEMP%\\ESO Discord Rich Presence Settings");
-        static string FileName = "EsoDiscordSettings.txt";
+        static string FileName = "Settings";
 
         static Settings DefaultSettings = new Settings
         {
-            CustomEsoLocation = "",
+            CustomEsoLocation = null,
+            CustomEsoInstallLocation = null,
+            CustomSteamAppID = null,
             Enabled = true,
             ShowCharacterName = true,
             ShowPartyInfo = true,
             ToTray = true,
-            StayTopMost = true
+            StayTopMost = true,
+            AutoStart = false
         };
 
         public string CustomEsoLocation
@@ -33,6 +36,34 @@ namespace ESO_Discord_RichPresence_Client
             set
             {
                 this["CustomEsoLocation"] = value;
+            }
+        }
+
+        public string CustomEsoInstallLocation
+        {
+            get
+            {
+                if (this.ContainsKey("CustomEsoInstallLocation"))
+                    return (string)this["CustomEsoInstallLocation"];
+                return Settings.DefaultSettings.CustomEsoInstallLocation;
+            }
+            set
+            {
+                this["CustomEsoInstallLocation"] = value;
+            }
+        }
+
+        public string CustomSteamAppID
+        {
+            get
+            {
+                if (this.ContainsKey("CustomSteamAppID"))
+                    return (string)this["CustomSteamAppID"];
+                return Settings.DefaultSettings.CustomSteamAppID;
+            }
+            set
+            {
+                this["CustomSteamAppID"] = value;
             }
         }
 
@@ -82,7 +113,9 @@ namespace ESO_Discord_RichPresence_Client
         {
             get
             {
-                return Convert.ToBoolean(this["ToTray"]);
+                if (this.ContainsKey("ToTray"))
+                    return Convert.ToBoolean(this["ToTray"]);
+                return Settings.DefaultSettings.ToTray;
             }
             set
             {
@@ -94,11 +127,27 @@ namespace ESO_Discord_RichPresence_Client
         {
             get
             {
-                return Convert.ToBoolean(this["StayTopMost"]);
+                if (this.ContainsKey("StayTopMost"))
+                    return Convert.ToBoolean(this["StayTopMost"]);
+                return Settings.DefaultSettings.StayTopMost;
             }
             set
             {
                 this["StayTopMost"] = value;
+            }
+        }
+
+        public bool AutoStart
+        {
+            get
+            {
+                if (this.ContainsKey("AutoStart"))
+                    return Convert.ToBoolean(this["AutoStart"]);
+                return Settings.DefaultSettings.AutoStart;
+            }
+            set
+            {
+                this["AutoStart"] = value;
             }
         }
 

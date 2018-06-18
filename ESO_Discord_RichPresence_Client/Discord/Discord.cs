@@ -97,7 +97,7 @@ namespace ESO_Discord_RichPresence_Client
             if (!this.Main.EsoIsRunning)
                 return;
             
-            this.PresenceData.state = ((character.InDungeon) ? $"In a dungeon as {character.GroupRole}" : "Roaming Tamriel");
+            this.PresenceData.state = ((character.InDungeon) ? (ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $"as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : $"Venturing through a Delve") : "Roaming Tamriel");
             this.PresenceData.details = $"{((this.ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
 
             if (this.ShowPartyInfo)
@@ -112,8 +112,22 @@ namespace ESO_Discord_RichPresence_Client
                 this.PresenceData.partySize = 0;
             }
 
-            this.PresenceData.largeImageKey = ((character.InDungeon) ? ESO.Dungeons[character.Zone] : ESO.Zones[character.Zone]);
-            this.PresenceData.largeImageText = ((ESO.Dungeons.Contains(character.Zone) || ESO.Zones.Contains(character.Zone)) ? character.Zone : "Tamriel");
+            this.PresenceData.largeImageKey = ((character.InDungeon) ? ((ESO.Trials.Contains(character.Zone)) ? ESO.Trials[character.Zone] : ESO.Dungeons[character.Zone]) : ESO.Zones[character.Zone]);
+            this.PresenceData.largeImageText = ((ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone)) ? character.Zone : (ESO.Dungeons.Contains(character.Zone)) ? character.Zone : "Tamriel");
+            
+            if (character.InDungeon && (ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone)))
+            {
+                this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                this.PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
+                this.PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
+            }
+
+            else
+            {
+                this.PresenceData.startTimestamp = this.Main.StartTimestamp;
+                this.PresenceData.smallImageKey = String.Empty;
+                this.PresenceData.smallImageText = String.Empty;
+            }
 
             DiscordRpc.UpdatePresence(this.PresenceData);
         }

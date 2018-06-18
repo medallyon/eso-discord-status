@@ -38,29 +38,29 @@ namespace ESO_Discord_RichPresence_Client
 
             this.DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
             this.SavedVars = new SavedVariables(this, this.DiscordClient, this.FolderBrowser);
+            this.CreateSteamAppIdForm();
         }
 
-        private void Main_Load(object sender, EventArgs e)
+        private void CreateSteamAppIdForm()
         {
-            this.Text = "ESO Discord Status";
-
             this.SteamAppIdForm = new Form();
-            this.SteamAppIdForm.Name = "SteamAppIdForm";
-            this.SteamAppIdForm.Hide();
+            var form = this.SteamAppIdForm;
+            form.Hide();
 
-            this.SteamAppIdForm.AutoSize = false;
-            this.SteamAppIdForm.TopLevel = true;
-            this.SteamAppIdForm.ControlBox = false;
-            this.SteamAppIdForm.FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.SteamAppIdForm.BackColor = Color.FromArgb(27, 28, 31);
-            this.SteamAppIdForm.ForeColor = this.ForeColor;
-            this.SteamAppIdForm.WindowState = FormWindowState.Normal;
-            this.SteamAppIdForm.MinimumSize = new Size(0, 0);
-            this.SteamAppIdForm.Size = new Size(124, 44);
-            this.SteamAppIdForm.StartPosition = FormStartPosition.Manual;
-            this.SteamAppIdForm.Location = new Point(
-                this.Location.X + this.Width - (this.SteamAppIdForm.Width / 2),
-                this.Location.Y + (this.Height / 2) - (this.SteamAppIdForm.Height / 2)
+            form.Name = "SteamAppIdForm";
+            form.AutoSize = false;
+            form.TopLevel = true;
+            form.ControlBox = false;
+            form.FormBorderStyle = FormBorderStyle.FixedSingle;
+            form.BackColor = Color.FromArgb(27, 28, 31);
+            form.ForeColor = this.ForeColor;
+            form.WindowState = FormWindowState.Normal;
+            form.MinimumSize = new Size(0, 0);
+            form.Size = new Size(124, 44);
+            form.StartPosition = FormStartPosition.Manual;
+            form.Location = new Point(
+                this.Location.X + this.Width - (form.Width / 2),
+                this.Location.Y + (this.Height / 2) - (form.Height / 2)
             );
 
             TextBox AppIdTextBox = new TextBox
@@ -74,12 +74,7 @@ namespace ESO_Discord_RichPresence_Client
             AppIdTextBox.KeyDown += AppIdTextBox_KeyDown;
             AppIdTextBox.LostFocus += AppIdTextBox_LostFocus;
 
-            this.SteamAppIdForm.Controls.Add(AppIdTextBox);
-
-            this.InitialiseSettings();
-            this.SavedVars.Initialise();
-
-            this.InitEsoTimer();
+            form.Controls.Add(AppIdTextBox);
         }
 
         private void InitialiseSettings()

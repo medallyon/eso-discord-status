@@ -221,19 +221,19 @@ namespace ESO_Discord_RichPresence_Client
 
         private void Box_CharacterName_CheckedChanged(object sender, EventArgs e)
         {
+            this.Settings.ShowCharacterName = this.Box_CharacterName.Checked;
             if (Discord.CurrentCharacter != null)
                 this.DiscordClient.UpdatePresence();
 
-            this.Settings.ShowCharacterName = this.Box_CharacterName.Checked;
             this.Settings.SaveToFile();
         }
 
         private void Box_ShowGroup_CheckedChanged(object sender, EventArgs e)
         {
+            this.Settings.ShowPartyInfo = this.Box_ShowGroup.Checked;
             if (Discord.CurrentCharacter != null)
                 this.DiscordClient.UpdatePresence();
 
-            this.Settings.ShowPartyInfo = this.Box_ShowGroup.Checked;
             this.Settings.SaveToFile();
         }
 

@@ -7,7 +7,7 @@ DRP.name = "DiscordRichPresence"
 DRP.meta = {
     name = "Discord Rich Presence",
     author = "@Medallyon#5012",
-    version = "0.1.0",
+    version = "0.2.0",
     website = "https://github.com/Medallyon/ESO_Discord_RichPresence_Client"
 }
 
@@ -21,6 +21,7 @@ DRP.savedVars.defaults = {
         ["autoReload"] = false
     },
     ["reloaded"] = true,
+
     ["account"] = nil,
     ["name"] = nil,
     ["gender"] = nil,
@@ -30,10 +31,19 @@ DRP.savedVars.defaults = {
     ["level"] = nil,
     ["alliance"] = nil,
     ["zone"] = nil,
+
     ["isgrouped"] = nil,
     ["inDungeon"] = nil,
     ["groupSize"] = nil,
-    ["groupRole"] = nil
+    ["groupRole"] = nil,
+    ["prefersDPS"] = nil,
+    ["prefersTank"] = nil,
+    ["prefersHeal"] = nil,
+    ["isDungeonVeteran"] = nil,
+
+    ["bg_GameType"] = nil,
+    ["bg_Name"] = nil,
+    ["bg_Description"] = nil
 }
 
 -------------------------------------------------------------
@@ -103,6 +113,8 @@ function DRP:StoreCharacterData()
     zo["groupSize"] = GetGroupSize()
     zo["inDungeon"] = IsUnitInDungeon(u)
     zo["groupRole"] = GetGroupMemberAssignedRole(u)
+    zo["isDungeonVeteran"] = GetCurrentZoneDungeonDifficulty()
+    zo["prefersDPS"], zo["prefersTank"], zo["prefersHeal"] = GetGroupMemberRoles(u)
 
     -- PvP-related Information
     bg = GetCurrentBattlegroundId()

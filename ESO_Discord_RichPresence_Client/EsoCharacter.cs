@@ -45,6 +45,7 @@ namespace ESO_Discord_RichPresence_Client
                 }
             }
         }
+        public string Zone { get; set; }
 
         public bool IsChampion { get; set; }
         public int Level { get; set; }
@@ -71,8 +72,49 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
 
+        public string[] PreferredGroupRoles
+        {
+            get
+            {
+                var preferred = new Dictionary<string, bool>
+                {
+                    { "DPS", this.PrefersDPS },
+                    { "Tank", this.PrefersTank },
+                    { "Healer", this.PrefersHeal }
+                };
+
+                foreach (var role in preferred.Where(r => !r.Value).ToList())
+                    preferred.Remove(role.Key);
+
+                return preferred.Keys.ToArray();
+            }
+        }
+
         public bool InDungeon { get; set; }
-        public string Zone { get; set; }
+
+        private int dungeonDifficultyInt;
+        public string DungeonDifficulty
+        {
+            get
+            {
+                switch (this.dungeonDifficultyInt)
+                {
+                    case 1:
+                        return "Normal";
+                    case 2:
+                        return "Veteran";
+                    default:
+                        return "";
+                }
+            }
+        }
+        public bool PrefersDPS { get; set; }
+        public bool PrefersTank { get; set; }
+        public bool PrefersHeal { get; set; }
+
+        public int Battlegrounds_GameType { get; set; }
+        public string Battlegrounds_Name { get; set; }
+        public string Battlegrounds_Description { get; set; }
 
         public EsoCharacter(LuaTable character)
         {
@@ -82,13 +124,22 @@ namespace ESO_Discord_RichPresence_Client
             this.Class = (string)character["class"];
             this.genderInt = (int)(double)character["gender"];
             this.allianceInt = (int)(double)character["alliance"];
+            this.Zone = (string)character["zone"];
             this.IsChampion = (bool)character["isChampion"];
             this.Level = (int)(double)character["level"];
+
             this.IsGrouped = (bool)character["isGrouped"];
             this.GroupSize = (int)(double)character["groupSize"];
             this.groupRoleInt = (int)(double)character["groupRole"];
             this.InDungeon = (bool)character["inDungeon"];
-            this.Zone = (string)character["zone"];
+            this.dungeonDifficultyInt = (int)(double)character["isDungeonVeteran"];
+            this.PrefersDPS = (bool)character["prefersDPS"];
+            this.PrefersTank = (bool)character["prefersTank"];
+            this.PrefersHeal = (bool)character["prefersHeal"];
+
+            this.Battlegrounds_GameType = (int)(double)character["bg_GameType"];
+            this.Battlegrounds_Name = (string)character["bg_Name"];
+            this.Battlegrounds_Description = (string)character["bg_Description"];
         }
     }
 }

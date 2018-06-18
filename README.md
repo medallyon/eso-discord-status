@@ -15,7 +15,7 @@ Visit the [Releases](https://github.com/Medallyon/eso-discord-rich-presence-clie
 1. Install the latest version of Microsoft Visual Studio
 2. Import this VS solution
 3. `Build` your solution
-4. [Grab the binaries](https://github.com/discordapp/discord-rpc/releases) for the Discord RPC API
+4. [Grab the dynamic binaries](https://github.com/discordapp/discord-rpc/releases) for the Discord RPC API and include them in your compiled directory
 5. Test and use to your liking!
 
 ## Usage

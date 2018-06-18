@@ -63,7 +63,7 @@ namespace ESO_Discord_RichPresence_Client
                         return "DPS";
                     case 2:
                         return "Tank";
-                    case 3:
+                    case 4:
                         return "Healer";
                     default:
                         return null;

@@ -71,7 +71,7 @@ namespace ESO_Discord_RichPresence_Client
                 return;
 
             this.CallbackCalls = 0;
-            this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            this.PresenceData.startTimestamp = this.Main.StartTimestamp;
 
             Initialize(this.ApplicationID, ref this.handlers, false, this.OptionalSteamAppID);
         }

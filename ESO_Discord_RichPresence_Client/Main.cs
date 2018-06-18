@@ -28,17 +28,28 @@ namespace ESO_Discord_RichPresence_Client
         private Form SteamAppIdForm;
 
         public bool EsoIsRunning { get; set; } = false;
+        public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
         public Main()
         {
             InitializeComponent();
+        }
+
+        private void Main_Load(object sender, EventArgs e)
+        {
+            this.Text = "ESO Discord Status";
 
             this.Settings = new Settings();
             this.Settings.Restore();
 
             this.DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
             this.SavedVars = new SavedVariables(this, this.DiscordClient, this.FolderBrowser);
+
             this.CreateSteamAppIdForm();
+            this.InitialiseSettings();
+            this.SavedVars.Initialise();
+
+            this.InitEsoTimer();
         }
 
         private void CreateSteamAppIdForm()
@@ -188,6 +199,8 @@ namespace ESO_Discord_RichPresence_Client
                 this.Label_EsoIsRunning.ForeColor = Color.LimeGreen;
                 this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, FontStyle.Regular);
                 this.Label_EsoIsRunning.Text = "ESO is running!\nYour status is being updated.";
+
+                this.StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
             }
 
             else if (pName.Length == 0 && this.EsoIsRunning)

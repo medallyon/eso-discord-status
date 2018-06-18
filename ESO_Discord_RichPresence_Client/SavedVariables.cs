@@ -13,7 +13,7 @@ namespace ESO_Discord_RichPresence_Client
 {
     class SavedVariables
     {
-        static private string CustomPathSaveDirectory = Environment.ExpandEnvironmentVariables(@"%TEMP%\\ESO_DiscordRichPresence");
+        private static readonly string CustomPathSaveDirectory = Environment.ExpandEnvironmentVariables(@"%TEMP%\\ESO_DiscordRichPresence");
         static public string esoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\\Documents\\Elder Scrolls Online");
         static public string Dir = $@"{esoDir}\\live\\SavedVariables";
 

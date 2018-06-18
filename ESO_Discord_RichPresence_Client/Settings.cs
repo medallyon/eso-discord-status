@@ -14,9 +14,9 @@ namespace ESO_Discord_RichPresence_Client
 
         static Settings DefaultSettings = new Settings
         {
-            CustomEsoLocation = null,
-            CustomEsoInstallLocation = null,
-            CustomSteamAppID = null,
+            CustomEsoLocation = "",
+            CustomEsoInstallLocation = "",
+            CustomSteamAppID = "",
             Enabled = true,
             ShowCharacterName = true,
             ShowPartyInfo = true,

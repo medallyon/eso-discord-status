@@ -95,6 +95,10 @@ namespace ESO_Discord_RichPresence_Client
 
         private void StartESO()
         {
+            Process[] pName = Process.GetProcessesByName("eso64");
+            if (pName.Length > 0)
+                return;
+
             if (this.Settings.CustomSteamAppID != null && this.Settings.CustomSteamAppID.Length >= 5)
             {
                 Process.Start($"steam://rungameid/{this.Settings.CustomSteamAppID}");

@@ -32,7 +32,27 @@ namespace ESO_Discord_RichPresence_Client
 
         public bool Contains(string zone)
         {
-            return (this[zone] == "default");
+            return (this[zone] != "default");
+        }
+    }
+
+    public class Trials : ZoneContainer
+    {
+        private static string key_type = "trial";
+
+        public Trials()
+        {
+            this.type = key_type;
+            this.Names = new string[]
+            {
+                "Asylum Sanctorium",
+                "Aetherian Archive",
+                "Hel Ra Citadel",
+                "Sanctum Ophidia",
+                "Maw of Lorkhaj",
+                "Cloudrest",
+                "Halls of Fabrication"
+            };
         }
     }
 
@@ -125,6 +145,7 @@ namespace ESO_Discord_RichPresence_Client
 
     public class ESO
     {
+        public static Trials Trials = new Trials();
         public static Dungeons Dungeons = new Dungeons();
         public static Zones Zones = new Zones();
     }

@@ -52,7 +52,6 @@
             this.Box_Enabled.TabIndex = 0;
             this.Box_Enabled.Text = "Enabled";
             this.Box_Enabled.UseVisualStyleBackColor = true;
-            this.Box_Enabled.UseWaitCursor = true;
             this.Box_Enabled.CheckedChanged += new System.EventHandler(this.Box_Enabled_CheckedChanged);
             // 
             // FolderBrowser
@@ -70,7 +69,6 @@
             this.Box_CharacterName.TabIndex = 1;
             this.Box_CharacterName.Text = "Use Character Name";
             this.Box_CharacterName.UseVisualStyleBackColor = true;
-            this.Box_CharacterName.UseWaitCursor = true;
             this.Box_CharacterName.CheckedChanged += new System.EventHandler(this.Box_CharacterName_CheckedChanged);
             // 
             // Box_ShowGroup
@@ -84,7 +82,6 @@
             this.Box_ShowGroup.TabIndex = 2;
             this.Box_ShowGroup.Text = "Show Party Info";
             this.Box_ShowGroup.UseVisualStyleBackColor = true;
-            this.Box_ShowGroup.UseWaitCursor = true;
             this.Box_ShowGroup.CheckedChanged += new System.EventHandler(this.Box_ShowGroup_CheckedChanged);
             // 
             // Box_StayTopMost
@@ -98,7 +95,6 @@
             this.Box_StayTopMost.TabIndex = 3;
             this.Box_StayTopMost.Text = "Stay On Top";
             this.Box_StayTopMost.UseVisualStyleBackColor = true;
-            this.Box_StayTopMost.UseWaitCursor = true;
             this.Box_StayTopMost.CheckedChanged += new System.EventHandler(this.Box_StayTopMost_CheckedChanged);
             // 
             // Label_EsoIsRunning
@@ -111,7 +107,6 @@
             this.Label_EsoIsRunning.TabIndex = 4;
             this.Label_EsoIsRunning.Text = "Evaluating if ESO is running...";
             this.Label_EsoIsRunning.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.Label_EsoIsRunning.UseWaitCursor = true;
             // 
             // Box_ToTray
             // 
@@ -124,7 +119,6 @@
             this.Box_ToTray.TabIndex = 5;
             this.Box_ToTray.Text = "Minimise to tray";
             this.Box_ToTray.UseVisualStyleBackColor = true;
-            this.Box_ToTray.UseWaitCursor = true;
             this.Box_ToTray.CheckedChanged += new System.EventHandler(this.Box_ToTray_CheckedChanged);
             // 
             // NotifyIcon1
@@ -145,7 +139,6 @@
             this.Box_AutoStart.TabIndex = 6;
             this.Box_AutoStart.Text = "Auto Start ESO";
             this.Box_AutoStart.UseVisualStyleBackColor = true;
-            this.Box_AutoStart.UseWaitCursor = true;
             this.Box_AutoStart.CheckedChanged += new System.EventHandler(this.Box_AutoStart_CheckedChanged);
             this.Box_AutoStart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Box_AutoStart_MouseClick);
             // 
@@ -162,6 +155,7 @@
             this.Controls.Add(this.Box_ShowGroup);
             this.Controls.Add(this.Box_CharacterName);
             this.Controls.Add(this.Box_Enabled);
+            this.Cursor = System.Windows.Forms.Cursors.Default;
             this.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(179)))), ((int)(((byte)(179)))), ((int)(((byte)(179)))));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -169,7 +163,6 @@
             this.Name = "Main";
             this.Text = "ESO Discord Rich Presence Client";
             this.TopMost = true;
-            this.UseWaitCursor = true;
             this.Load += new System.EventHandler(this.Main_Load);
             this.Resize += new System.EventHandler(this.Main_Resize);
             this.ResumeLayout(false);

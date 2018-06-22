@@ -113,7 +113,7 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             this.PresenceData.largeImageKey = ((character.InDungeon) ? ((ESO.Trials.Contains(character.Zone)) ? ESO.Trials[character.Zone] : ESO.Dungeons[character.Zone]) : ESO.Zones[character.Zone]);
-            this.PresenceData.largeImageText = ((ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone)) ? character.Zone : (ESO.Dungeons.Contains(character.Zone)) ? character.Zone : "Tamriel");
+            this.PresenceData.largeImageText = character.Zone;
             
             if (character.InDungeon && (ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone)))
             {

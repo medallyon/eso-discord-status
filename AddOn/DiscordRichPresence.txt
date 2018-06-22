@@ -1,7 +1,7 @@
 ## Title: Discord Rich Presence
 ## APIVersion: 100023
 ## Author: Medallyon
-## Version: 0.1
+## Version: 0.2.1
 ## SavedVariables: DiscordRichPresence_SavedVars
 
-DiscordRichPresence_Main.lua
+DiscordRichPresence.lua

@@ -7,7 +7,7 @@ DRP.name = "DiscordRichPresence"
 DRP.meta = {
     name = "Discord Rich Presence",
     author = "@Medallyon#5012",
-    version = "0.2.0",
+    version = "0.2.1",
     website = "https://github.com/Medallyon/ESO_Discord_RichPresence_Client"
 }
 

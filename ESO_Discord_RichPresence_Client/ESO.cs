@@ -6,147 +6,160 @@ using System.Threading.Tasks;
 
 namespace ESO_Discord_RichPresence_Client
 {
-    public class ZoneContainer
+    public static class Zones
     {
-        internal string type;
-        internal string[] Names;
-
-        private string ResolveKeyname(string name)
+        #region Data
+        private static Dictionary<string, string[]> ZoneMap = new Dictionary<string, string[]>(3)
         {
-            if (!this.Names.Any(x => x.ToLower() == name.ToLower()))
+            {
+                "zone",
+                new string[]
+                {
+                    "Alik'r Desert",
+                    "Artaeum",
+                    "Auridon",
+                    "Bal Foyen",
+                    "Bangkorai",
+                    "Betnikh",
+                    "Bleakrock Isle",
+                    "Clockwork City",
+                    "Coldharbour",
+                    "Craglorn",
+                    "Cyrodiil",
+                    "Deshaan",
+                    "Eastmarch",
+                    "Glenumbra",
+                    "Gold Coast",
+                    "Grahtwood",
+                    "Greenshade",
+                    "Hew's Bane",
+                    "Khenarthi's Roost",
+                    "Malabal Tor",
+                    "Reaper's March",
+                    "Rivenspire",
+                    "Shadowfen",
+                    "Stonefalls",
+                    "Stormhaven",
+                    "Stros M'Kai",
+                    "Summerset",
+                    "The Rift",
+                    "Vvardenfell",
+                    "Wrothgar"
+                }
+            },
+            {
+                "dungeon",
+                new string[]
+                {
+                    "Arx Corinium",
+                    "Blackheart Haven",
+                    "Blessed Crucible",
+                    "Bloodroot Forge",
+                    "City of Ash I",
+                    "City of Ash II",
+                    "Cradle of Shadows",
+                    "Crypt of Hearts I",
+                    "Crypt of Hearts II",
+                    "Darkshade Caverns I",
+                    "Darkshade Caverns II",
+                    "Direfrost Keep",
+                    "Elden Hollow I",
+                    "Elden Hollow II",
+                    "Falkreath Hold",
+                    "Fang Lair",
+                    "Fungal Grotto I",
+                    "Fungal Grotto II",
+                    "Imperial City Prison",
+                    "Ruins of Mazzatun",
+                    "Scalecaller Peak",
+                    "Selene's Web",
+                    "Spindleclutch I",
+                    "Spindleclutch II",
+                    "Tempest Island",
+                    "The Banished Cells I",
+                    "The Banished Cells II",
+                    "Vaults of Madness",
+                    "Wayrest Sewers I",
+                    "Wayrest Sewers II",
+                    "White-Gold Tower"
+                }
+            },
+            {
+                "trial",
+                new string[]
+                {
+                    "Asylum Sanctorium",
+                    "Aetherian Archive",
+                    "Cloudrest",
+                    "Halls of Fabrication",
+                    "Hel Ra Citadel",
+                    "Maw of Lorkhaj",
+                    "Sanctum Ophidia"
+                }
+            }
+        };
+        #endregion
+
+        #region Private methods
+        private static bool Lookup(string category, string locationName)
+        {
+            if (!ZoneMap.ContainsKey(category))
+                return false;
+
+            return ZoneMap[category].Any(l => l.ToLowerInvariant() == locationName.ToLowerInvariant());
+        }
+
+        private static string GetKey(string category, string locationName)
+        {
+            if (!Lookup(category, locationName))
                 return "default";
 
-            return $"{this.type}_" + name.ToLower()
+            return $"{category}_" + locationName.ToLower()
                 .Replace(' ', '_')
                 .Replace('-', '_')
                 .Replace("\'", String.Empty);
         }
+        #endregion
 
-        public string this[string index]
+        #region Specialisation classes for zone types
+        public static class Locations
         {
-            get
+            public static bool IsValid(string locationName)
             {
-                return ResolveKeyname(index);
+                return Lookup("locations", locationName);
+            }
+
+            public static string Get(string locationName)
+            {
+                return GetKey("locations", locationName);
             }
         }
 
-        public bool Contains(string zone)
+        public static class Dungeons
         {
-            return (this[zone] != "default");
-        }
-    }
-
-    public class Trials : ZoneContainer
-    {
-        private static string key_type = "trial";
-
-        public Trials()
-        {
-            this.type = key_type;
-            this.Names = new string[]
+            public static bool IsValid(string locationName)
             {
-                "Asylum Sanctorium",
-                "Aetherian Archive",
-                "Hel Ra Citadel",
-                "Sanctum Ophidia",
-                "Maw of Lorkhaj",
-                "Cloudrest",
-                "Halls of Fabrication"
-            };
-        }
-    }
+                return Lookup("dungeon", locationName);
+            }
 
-    public class Dungeons : ZoneContainer
-    {
-        static private string key_type = "dungeon";
-
-        public Dungeons()
-        {
-            this.type = key_type;
-            this.Names = new string[]
+            public static string Get(string locationName)
             {
-                "Arx Corinium",
-                "Blackheart Haven",
-                "Blessed Crucible",
-                "Bloodroot Forge",
-                "City of Ash I",
-                "City of Ash II",
-                "Cradle of Shadows",
-                "Crypt of Hearts I",
-                "Crypt of Hearts II",
-                "Darkshade Caverns I",
-                "Darkshade Caverns II",
-                "Direfrost Keep",
-                "Elden Hollow I",
-                "Elden Hollow II",
-                "Falkreath Hold",
-                "Fang Lair",
-                "Fungal Grotto I",
-                "Fungal Grotto II",
-                "Imperial City Prison",
-                "Ruins of Mazzatun",
-                "Scalecaller Peak",
-                "Selene's Web",
-                "Spindleclutch I",
-                "Spindleclutch II",
-                "Tempest Island",
-                "The Banished Cells I",
-                "The Banished Cells II",
-                "Vaults of Madness",
-                "Wayrest Sewers I",
-                "Wayrest Sewers II",
-                "White-Gold Tower"
-            };
+                return GetKey("dungeon", locationName);
+            }
         }
-    }
 
-    public class Zones : ZoneContainer
-    {
-        private static string key_type = "zone";
-
-        public Zones()
+        public static class Trials
         {
-            this.type = key_type;
-            this.Names = new string[]
+            public static bool IsValid(string locationName)
             {
-                "Auridon",
-                "Grahtwood",
-                "Greenshade",
-                "Khenarthi's Roost",
-                "Malabal Tor",
-                "Reaper's March",
-                "Alik'r Desert",
-                "Bangkorai",
-                "Betnikh",
-                "Glenumbra",
-                "Rivenspire",
-                "Stormhaven",
-                "Stros M'Kai",
-                "Bal Foyen",
-                "Bleakrock Isle",
-                "Deshaan",
-                "Eastmarch",
-                "The Rift",
-                "Shadowfen",
-                "Stonefalls",
-                "Artaeum",
-                "Clockwork City",
-                "Coldharbour",
-                "Craglorn",
-                "Cyrodiil",
-                "Gold Coast",
-                "Hew's Bane",
-                "Summerset",
-                "Vvardenfell",
-                "Wrothgar"
-            };
-        }
-    }
+                return Lookup("trial", locationName);
+            }
 
-    public class ESO
-    {
-        public static Trials Trials = new Trials();
-        public static Dungeons Dungeons = new Dungeons();
-        public static Zones Zones = new Zones();
+            public static string Get(string locationName)
+            {
+                return GetKey("trial", locationName);
+            }
+        }
+        #endregion
     }
 }

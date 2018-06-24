@@ -97,7 +97,7 @@ namespace ESO_Discord_RichPresence_Client
             if (!this.Main.EsoIsRunning)
                 return;
             
-            this.PresenceData.state = ((character.InDungeon) ? (ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $"as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : $"Venturing through a Delve") : "Roaming Tamriel");
+            this.PresenceData.state = ((character.InDungeon) ? (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $"as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : $"Venturing through a Delve") : "Roaming Tamriel");
             this.PresenceData.details = $"{((this.ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
 
             if (this.ShowPartyInfo)
@@ -112,10 +112,10 @@ namespace ESO_Discord_RichPresence_Client
                 this.PresenceData.partySize = 0;
             }
 
-            this.PresenceData.largeImageKey = ((character.InDungeon) ? ((ESO.Trials.Contains(character.Zone)) ? ESO.Trials[character.Zone] : ESO.Dungeons[character.Zone]) : ESO.Zones[character.Zone]);
+            this.PresenceData.largeImageKey = ((character.InDungeon) ? ((Zones.Trials.IsValid(character.Zone)) ? Zones.Trials.Get(character.Zone) : Zones.Dungeons.Get(character.Zone)) : Zones.Locations.Get(character.Zone));
             this.PresenceData.largeImageText = character.Zone;
             
-            if (character.InDungeon && (ESO.Trials.Contains(character.Zone) || ESO.Dungeons.Contains(character.Zone)))
+            if (character.InDungeon && (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone)))
             {
                 this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
                 this.PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";

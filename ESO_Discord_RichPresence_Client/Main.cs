@@ -17,9 +17,9 @@ namespace ESO_Discord_RichPresence_Client
 {
     public partial class Main : Form
     {
-        public static readonly string DISCORD_CLIENT_ID = "453713122713272331";
-        public static readonly string ESO_STEAM_APP_ID = "306130";
-        public static readonly string ADDON_NAME = "DiscordRichPresence";
+        public const string DISCORD_CLIENT_ID = "453713122713272331";
+        public const string ESO_STEAM_APP_ID = "306130";
+        public const string ADDON_NAME = "DiscordRichPresence";
         private static bool OnceMinimisedToTray = false;
 
         public Settings Settings;
@@ -54,6 +54,7 @@ namespace ESO_Discord_RichPresence_Client
 
         private void CreateSteamAppIdForm()
         {
+            /* FIXME: This should be refactored into a Designer form, as opposed to a runtime one. */
             this.SteamAppIdForm = new Form();
             var form = this.SteamAppIdForm;
             form.Hide();

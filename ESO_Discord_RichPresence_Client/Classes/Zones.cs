@@ -22,7 +22,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Bangkorai",
                     "Betnikh",
                     "Bleakrock Isle",
-                    "Clockwork City",
+                    "The Clockwork City",
                     "Coldharbour",
                     "Craglorn",
                     "Cyrodiil",

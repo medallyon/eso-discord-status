@@ -56,25 +56,25 @@
   <ItemGroup>
     <Compile Include="Discord\Discord.cs" />
     <Compile Include="Discord\DiscordRpc.cs" />
-    <Compile Include="EsoCharacter.cs" />
-    <Compile Include="Main.cs">
+    <Compile Include="Classes\EsoCharacter.cs" />
+    <Compile Include="Forms\Main.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Main.Designer.cs">
+    <Compile Include="Forms\Main.Designer.cs">
       <DependentUpon>Main.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SavedVariables.cs" />
-    <Compile Include="Settings.cs" />
-    <Compile Include="SteamAppIdForm.cs">
+    <Compile Include="Classes\SavedVariables.cs" />
+    <Compile Include="Classes\Settings.cs" />
+    <Compile Include="Forms\SteamAppIdForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SteamAppIdForm.Designer.cs">
+    <Compile Include="Forms\SteamAppIdForm.Designer.cs">
       <DependentUpon>SteamAppIdForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Zones.cs" />
-    <EmbeddedResource Include="Main.resx">
+    <Compile Include="Classes\Zones.cs" />
+    <EmbeddedResource Include="Forms\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -86,7 +86,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <EmbeddedResource Include="SteamAppIdForm.resx">
+    <EmbeddedResource Include="Forms\SteamAppIdForm.resx">
       <DependentUpon>SteamAppIdForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="packages.config" />

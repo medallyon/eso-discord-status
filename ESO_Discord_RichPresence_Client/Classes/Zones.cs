@@ -126,12 +126,12 @@ namespace ESO_Discord_RichPresence_Client
         {
             public static bool IsValid(string locationName)
             {
-                return Lookup("locations", locationName);
+                return Lookup("zone", locationName);
             }
 
             public static string Get(string locationName)
             {
-                return GetKey("locations", locationName);
+                return GetKey("zone", locationName);
             }
         }
 

@@ -107,4 +107,9 @@
     <Content Include="esodiscord.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+      xcopy /s /y "..\..\..\packages\NLua.1.3.2.1\lib\native\*.*" "$(TargetDir)"
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>

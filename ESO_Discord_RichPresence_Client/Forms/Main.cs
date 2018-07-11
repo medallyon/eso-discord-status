@@ -23,6 +23,7 @@ namespace ESO_Discord_RichPresence_Client
         private static bool OnceMinimisedToTray = false;
 
         public Settings Settings;
+        private Timer EsoTimer;
         private SavedVariables SavedVars;
         private Discord DiscordClient;
         private SteamAppIdForm SteamAppIdForm;
@@ -164,44 +165,63 @@ namespace ESO_Discord_RichPresence_Client
 
         private void InitEsoTimer()
         {
-            Timer timer = new Timer();
-            timer.Tick += new EventHandler(UpdateEsoText);
-            timer.Interval = 1000;
-            timer.Start();
+            this.EsoTimer = new Timer();
+            this.EsoTimer.Tick += new EventHandler(UpdateEsoText);
+            this.EsoTimer.Interval = 1000;
+            this.EsoTimer.Start();
         }
 
         private void UpdateEsoText(object sender, EventArgs e)
         {
-            Process[] pName = Process.GetProcessesByName("eso64");
+            if (!SavedVariables.Exists)
+            {
+                this.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
+                return;
+            }
 
-            if (pName.Length > 0 && !this.EsoIsRunning)
+            Process[] processes = Process.GetProcessesByName("eso64");
+
+            if (processes.Length > 0 && !this.EsoIsRunning)
             {
                 this.EsoIsRunning = true;
                 this.DiscordClient.Enable();
                 this.DiscordClient.UpdatePresence();
-
-                this.Label_EsoIsRunning.ForeColor = Color.LimeGreen;
-                this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, FontStyle.Regular);
-                this.Label_EsoIsRunning.Text = "ESO is running!\nYour status is being updated.";
-
                 this.StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
             }
 
-            else if (pName.Length == 0 && this.EsoIsRunning)
+            else if ((processes.Length == 0 && this.EsoIsRunning) || processes.Length == 0)
             {
                 this.EsoIsRunning = false;
                 this.DiscordClient.Disable();
-
-                this.Label_EsoIsRunning.ForeColor = Color.Firebrick;
-                this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, FontStyle.Regular);
-                this.Label_EsoIsRunning.Text = "ESO isn't running!\nYour status won't be updated.";
             }
 
-            else if (pName.Length == 0)
+            if (this.EsoIsRunning)
+                this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen, FontStyle.Regular);
+            else
+                this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick, FontStyle.Regular);
+        }
+
+        public void UpdateStatusField(string status)
+        {
+            this.UpdateStatusField(status, Color.DarkGray, FontStyle.Regular);
+        }
+
+        public void UpdateStatusField(string status, Color newColor, FontStyle style)
+        {
+            if (this.Label_EsoIsRunning.InvokeRequired)
             {
-                this.Label_EsoIsRunning.ForeColor = Color.Firebrick;
-                this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, FontStyle.Regular);
-                this.Label_EsoIsRunning.Text = "ESO isn't running!\nYour status won't be updated.";
+                this.Label_EsoIsRunning.Invoke(new MethodInvoker(delegate {
+                    this.Label_EsoIsRunning.ForeColor = newColor;
+                    this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, style);
+                    this.Label_EsoIsRunning.Text = status;
+                }));
+            }
+
+            else
+            {
+                this.Label_EsoIsRunning.ForeColor = newColor;
+                this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, style);
+                this.Label_EsoIsRunning.Text = status;
             }
         }
 

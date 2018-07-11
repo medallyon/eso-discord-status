@@ -8,21 +8,35 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Drawing;
 
 namespace ESO_Discord_RichPresence_Client
 {
     class SavedVariables
     {
-        private static readonly string CustomPathSaveDirectory = Environment.ExpandEnvironmentVariables(@"%TEMP%\\ESO_DiscordRichPresence");
-        static public string esoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\\Documents\\Elder Scrolls Online");
-        static public string Dir = $@"{esoDir}\\live\\SavedVariables";
+        static public bool Exists = false;
+        private static readonly string CustomPathSaveDirectory = Environment.ExpandEnvironmentVariables(@"%TEMP%\ESO_DiscordRichPresence");
+        static public string esoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
+        static public string Dir
+        {
+            get
+            {
+                return $@"{SavedVariables.esoDir}\live\SavedVariables";
+            }
+        }
 
         internal readonly Main Main;
         private readonly Discord _client;
         private readonly FolderBrowserDialog _browser;
         private readonly FileSystemWatcher _watcher;
 
-        public string Path { get; set; } = "";
+        public string Path
+        {
+            get
+            {
+                return $@"{SavedVariables.Dir}\{Main.ADDON_NAME}.lua";
+            }
+        }
 
         public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
         {
@@ -32,20 +46,15 @@ namespace ESO_Discord_RichPresence_Client
             this._watcher = new FileSystemWatcher();
         }
 
-        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser, string savedVarsPath)
-        {
-            this.Main = form;
-            this._client = client;
-            this._browser = browser;
-            this._watcher = new FileSystemWatcher();
-            this.Path = savedVarsPath;
-        }
-
         public void Initialise()
         {
-            this.Path = this.Main.Settings.CustomEsoLocation;
+            SavedVariables.esoDir = this.Main.Settings.CustomEsoLocation;
+
             this.EnsureSavedVarsExist();
             this.SetupWatcher();
+
+            if (!SavedVariables.Exists)
+                return;
 
             string LuaContents = File.ReadAllText(this.Path);
             Discord.CurrentCharacter = SavedVariables.ParseLua(LuaContents);
@@ -86,12 +95,6 @@ namespace ESO_Discord_RichPresence_Client
 
         public void EnsureSavedVarsExist()
         {
-            if (this.Path.Length > 0)
-            {
-                SavedVariables.esoDir = this.Path;
-                SavedVariables.Dir = $@"{this.Path}\\live\\SavedVariables";
-            }
-
             // "Elder Scrolls Online" doesn't exist in "My Documents"
             if (!Directory.Exists(SavedVariables.esoDir))
             {
@@ -102,7 +105,6 @@ namespace ESO_Discord_RichPresence_Client
                     if (this._browser.ShowDialog() == DialogResult.OK)
                     {
                         SavedVariables.esoDir = this._browser.SelectedPath;
-                        SavedVariables.Dir = $@"{SavedVariables.esoDir}\\live\\SavedVariables";
 
                         this.Main.Settings["CustomEsoLocation"] = SavedVariables.esoDir;
                         this.Main.Settings.SaveToFile();
@@ -130,20 +132,15 @@ namespace ESO_Discord_RichPresence_Client
                         Environment.Exit(1);
                 }
 
-                // user probably hasn't run the addon, so no SavedVariables exist for our addon
                 else
                 {
-                    var savedVarsResponse = MessageBox.Show($"Please run the \"{Main.ADDON_NAME}\" AddOn at least once. To do this, reload your UI in-game by typing \'/reloadui\' into the chat box.", "SavedVariables Missing", MessageBoxButtons.RetryCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
-
-                    if (savedVarsResponse == DialogResult.Retry)
-                        this.EnsureSavedVarsExist();
-                    else
-                        Environment.Exit(1);
+                    SavedVariables.Exists = false;
+                    this.Main.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
                 }
             }
 
             else
-                this.Path = $@"{SavedVariables.Dir}\\{Main.ADDON_NAME}.lua";
+                SavedVariables.Exists = true;
         }
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
@@ -153,6 +150,7 @@ namespace ESO_Discord_RichPresence_Client
             this._watcher.Filter = $"{Main.ADDON_NAME}.lua";
             this._watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
 
+            this._watcher.Created += new FileSystemEventHandler(this.OnChanged);
             this._watcher.Changed += new FileSystemEventHandler(this.OnChanged);
             this._watcher.Deleted += new FileSystemEventHandler(this.OnDeleted);
             this._watcher.Renamed += new RenamedEventHandler(this.OnRenamed);
@@ -162,7 +160,8 @@ namespace ESO_Discord_RichPresence_Client
 
         private void OnChanged(object source, FileSystemEventArgs e)
         {
-            Console.WriteLine("SavedVariables file changed");
+            Console.WriteLine("SavedVariables file changed or created");
+            SavedVariables.Exists = true;
             
             // wait 1 second here to avoid conflicts with file being busy
             Thread.Sleep(1000);
@@ -171,6 +170,7 @@ namespace ESO_Discord_RichPresence_Client
             {
                 string LuaCharacter = File.ReadAllText(e.FullPath);
                 Discord.CurrentCharacter = SavedVariables.ParseLua(LuaCharacter);
+                this._client.Enable();
                 this._client.UpdatePresence(Discord.CurrentCharacter);
             }
 
@@ -188,12 +188,18 @@ namespace ESO_Discord_RichPresence_Client
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
             Console.WriteLine("SavedVariables file deleted");
+            SavedVariables.Exists = false;
+            this._client.Disable();
+
             this.EnsureSavedVarsExist();
         }
 
         private void OnRenamed(object source, RenamedEventArgs e)
         {
             Console.WriteLine("SavedVariables file renamed");
+            SavedVariables.Exists = false;
+            this._client.Disable();
+
             this.EnsureSavedVarsExist();
         }
     }

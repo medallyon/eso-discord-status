@@ -94,7 +94,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void UpdatePresence(EsoCharacter character)
         {
-            if (!this.Main.EsoIsRunning)
+            if (!this.Main.EsoIsRunning || character == null)
                 return;
             
             this.PresenceData.state = ((character.InDungeon) ? (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $" as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : $"Venturing through a Delve") : "Roaming Tamriel");

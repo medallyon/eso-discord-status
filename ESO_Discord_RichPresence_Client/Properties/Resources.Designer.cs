@@ -10,6 +10,7 @@
 
 namespace ESO_Discord_RichPresence_Client.Properties
 {
+    using System;
 
 
     /// <summary>
@@ -19,7 +20,7 @@ namespace ESO_Discord_RichPresence_Client.Properties
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class Resources
@@ -42,7 +43,7 @@ namespace ESO_Discord_RichPresence_Client.Properties
         {
             get
             {
-                if ((resourceMan == null))
+                if (object.ReferenceEquals(resourceMan, null))
                 {
                     global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("ESO_Discord_RichPresence_Client.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
@@ -65,6 +66,92 @@ namespace ESO_Discord_RichPresence_Client.Properties
             set
             {
                 resourceCulture = value;
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to DRP = {}
+        ///DRP.handlers = {}
+        ///DRP.commands = {}
+        ///
+        ///DRP.name = &quot;DiscordRichPresence&quot;
+        ///
+        ///DRP.meta = {
+        ///    name = &quot;Discord Rich Presence&quot;,
+        ///    author = &quot;@Medallyon#5012&quot;,
+        ///    version = &quot;0.2.1&quot;,
+        ///    website = &quot;https://github.com/Medallyon/ESO_Discord_RichPresence_Client&quot;
+        ///}
+        ///
+        ///DRP.savedVars = {}
+        ///DRP.savedVars.name = &quot;DiscordRichPresence_SavedVars&quot;
+        ///DRP.savedVars.version = 1
+        ///
+        ///DRP.savedVars.ZO = nil
+        ///DRP.savedVars.defaults = {
+        ///    [&quot;settings&quot;] = {
+        ///        [&quot;autoReload&quot;] = false
+        ///    },
+        ///    [&quot;reloaded&quot;] = [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ADDON_CONTENT
+        {
+            get
+            {
+                return ResourceManager.GetString("ADDON_CONTENT", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to                     GNU GENERAL PUBLIC LICENSE
+        ///                       Version 3, 29 June 2007
+        ///
+        /// Copyright (C) 2007 Free Software Foundation, Inc. &lt;http://fsf.org/&gt;
+        /// Everyone is permitted to copy and distribute verbatim copies
+        /// of this license document, but changing it is not allowed.
+        ///
+        ///                            Preamble
+        ///
+        ///  The GNU General Public License is a free, copyleft license for
+        ///software and other kinds of works.
+        ///
+        ///  The licenses for most software and other practical works are designed
+        ///to [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string ADDON_LICENSE
+        {
+            get
+            {
+                return ResourceManager.GetString("ADDON_LICENSE", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries. All rights reserved..
+        /// </summary>
+        internal static string ADDON_README
+        {
+            get
+            {
+                return ResourceManager.GetString("ADDON_README", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Looks up a localized string similar to ## Title: Discord Rich Presence
+        ///## APIVersion: 100023
+        ///## Author: Medallyon
+        ///## Version: 0.2.1
+        ///## SavedVariables: DiscordRichPresence_SavedVars
+        ///
+        ///DiscordRichPresence.lua
+        ///.
+        /// </summary>
+        internal static string ADDON_TXT
+        {
+            get
+            {
+                return ResourceManager.GetString("ADDON_TXT", resourceCulture);
             }
         }
     }

@@ -119,15 +119,18 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             // if lua file doesn't exist in "SavedVariables"
-            if (!File.Exists($@"{SavedVariables.Dir}\\{Main.ADDON_NAME}.lua"))
+            if (!File.Exists($@"{SavedVariables.Dir}\{Main.ADDON_NAME}.lua"))
             {
                 // if eso addon doesn't exist
-                if (!Directory.Exists($@"{SavedVariables.esoDir}\\live\\AddOns\\{Main.ADDON_NAME}"))
+                if (!Directory.Exists($@"{SavedVariables.esoDir}\live\AddOns\{Main.ADDON_NAME}"))
                 {
-                    var addonResponse = MessageBox.Show($"The \"{Main.ADDON_NAME}\" AddOn was not detected in your Addons Folder. Download the AddOn and try again.", "AddOn Missing", MessageBoxButtons.RetryCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                    var addonResponse = MessageBox.Show($"The \"{Main.ADDON_NAME}\" AddOn was not detected in your Addons Folder. Do you want to install the addon and try again?", "AddOn Missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
 
-                    if (addonResponse == DialogResult.Retry)
+                    if (addonResponse == DialogResult.OK)
+                    {
+                        this.Main.InstallAddon();
                         this.EnsureSavedVarsExist();
+                    }
                     else
                         Environment.Exit(1);
                 }

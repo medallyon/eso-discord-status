@@ -85,6 +85,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="Forms\SteamAppIdForm.resx">
       <DependentUpon>SteamAppIdForm.cs</DependentUpon>
@@ -99,12 +100,16 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Content Include="Resources\ADDON_CONTENT.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="esodiscord.ico" />
+    <None Include="Resources\ADDON_README.txt" />
+    <None Include="Resources\ADDON_LICENSE.txt" />
+    <None Include="Resources\ADDON_TXT.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

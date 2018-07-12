@@ -74,6 +74,7 @@
       <DependentUpon>SteamAppIdForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\Zones.cs" />
+    <Compile Include="UnpackAddonFiles.cs" />
     <EmbeddedResource Include="Forms\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>
     </EmbeddedResource>
@@ -90,6 +91,7 @@
     <EmbeddedResource Include="Forms\SteamAppIdForm.resx">
       <DependentUpon>SteamAppIdForm.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="ADDON.PAF" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -100,21 +102,21 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <Content Include="Resources\ADDON_CONTENT.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="esodiscord.ico" />
-    <None Include="Resources\ADDON_README.txt" />
-    <None Include="Resources\ADDON_LICENSE.txt" />
-    <None Include="Resources\ADDON_TXT.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
       xcopy /s /y "..\..\..\packages\NLua.1.3.2.1\lib\native\*.*" "$(TargetDir)"
-    </PostBuildEvent>
+</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>echo "Packaging AddOn directory..."
+"$(SolutionDir)PackAddonFiles\$(OutDir)PackAddonFiles.exe" "$(SolutionDir)AddOn" "$(ProjectDir)ADDON.PAF"</PreBuildEvent>
   </PropertyGroup>
 </Project>

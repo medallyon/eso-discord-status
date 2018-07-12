@@ -1,0 +1,2 @@
+# Ignore the AddOn packed content file from the build.
+ADDON.PAF

@@ -137,6 +137,9 @@ namespace ESO_Discord_RichPresence_Client
 
                 else
                 {
+                    // Ensure that the AddOn is up-to-date.
+                    this.Main.InstallAddon();
+
                     SavedVariables.Exists = false;
                     this.Main.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
                 }

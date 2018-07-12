@@ -229,13 +229,11 @@ namespace ESO_Discord_RichPresence_Client
         {
             string AddonDirectory = $@"{SavedVariables.esoDir}\live\AddOns\{Main.ADDON_NAME}";
 
-            if (!Directory.Exists(AddonDirectory))
-                Directory.CreateDirectory(AddonDirectory);
+            if (Directory.Exists(AddonDirectory))
+                Directory.Delete(AddonDirectory, true);
+            Directory.CreateDirectory(AddonDirectory);
 
-            File.WriteAllText($@"{AddonDirectory}\{Main.ADDON_NAME}.lua", Properties.Resources.ADDON_CONTENT);
-            File.WriteAllText($@"{AddonDirectory}\{Main.ADDON_NAME}.txt", Properties.Resources.ADDON_TXT);
-            File.WriteAllText($@"{AddonDirectory}\LICENSE", Properties.Resources.ADDON_LICENSE);
-            File.WriteAllText($@"{AddonDirectory}\README.txt", Properties.Resources.ADDON_README);
+            UnpackAddonFiles.UnpackAddon(AddonDirectory);
         }
 
         private void Box_Enabled_CheckedChanged(object sender, EventArgs e)

@@ -48,7 +48,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void Initialise()
         {
-            SavedVariables.esoDir = this.Main.Settings.CustomEsoLocation;
+            SavedVariables.esoDir = (string)this.Main.Settings.Get("CustomEsoLocation");
 
             this.EnsureSavedVarsExist();
             this.SetupWatcher();
@@ -105,9 +105,7 @@ namespace ESO_Discord_RichPresence_Client
                     if (this._browser.ShowDialog() == DialogResult.OK)
                     {
                         SavedVariables.esoDir = this._browser.SelectedPath;
-
-                        this.Main.Settings["CustomEsoLocation"] = SavedVariables.esoDir;
-                        this.Main.Settings.SaveToFile();
+                        this.Main.Settings.Set("CustomEsoLocation", SavedVariables.esoDir);
                     }
 
                     else

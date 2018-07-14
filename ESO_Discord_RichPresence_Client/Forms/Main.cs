@@ -40,7 +40,6 @@ namespace ESO_Discord_RichPresence_Client
             this.Text = "ESO Discord Status";
 
             this.Settings = new Settings();
-            this.Settings.Restore();
 
             this.DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
             this.SavedVars = new SavedVariables(this, this.DiscordClient, this.FolderBrowser);
@@ -74,17 +73,17 @@ namespace ESO_Discord_RichPresence_Client
 
         private void InitialiseSettings()
         {
-            this.Box_Enabled.Checked = this.Settings.Enabled;
-            this.Box_CharacterName.Checked = this.Settings.ShowCharacterName;
-            this.Box_ShowGroup.Checked = this.Settings.ShowPartyInfo;
-            this.Box_ToTray.Checked = this.Settings.ToTray;
-            this.Box_StayTopMost.Checked = this.Settings.StayTopMost;
-            this.Box_AutoStart.Checked = this.Settings.AutoStart;
+            this.Box_Enabled.Checked = (bool)this.Settings.Get("Enabled");
+            this.Box_CharacterName.Checked = (bool)this.Settings.Get("ShowCharacterName");
+            this.Box_ShowGroup.Checked = (bool)this.Settings.Get("ShowPartyInfo");
+            this.Box_ToTray.Checked = (bool)this.Settings.Get("ToTray");
+            this.Box_StayTopMost.Checked = (bool)this.Settings.Get("StayTopMost");
+            this.Box_AutoStart.Checked = (bool)this.Settings.Get("AutoStart");
 
-            if (this.Settings.CustomSteamAppID != null)
-                this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = this.Settings.CustomSteamAppID;
+            if (this.Settings.Get("CustomSteamAppID") != null)
+                this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)this.Settings.Get("CustomSteamAppID");
 
-            if (this.Settings.AutoStart)
+            if ((bool)this.Settings.Get("AutoStart"))
                 this.StartESO();
         }
 
@@ -94,9 +93,9 @@ namespace ESO_Discord_RichPresence_Client
             if (pName.Length > 0)
                 return;
 
-            if (this.Settings.CustomSteamAppID != null && this.Settings.CustomSteamAppID.Length >= 5)
+            if (this.Settings.Get("CustomSteamAppID") != null && this.Settings.Get("CustomSteamAppID").ToString().Length >= 5)
             {
-                Process.Start($"steam://rungameid/{this.Settings.CustomSteamAppID}");
+                Process.Start($"steam://rungameid/{(string)this.Settings.Get("CustomSteamAppID")}");
                 return;
             }
 
@@ -135,8 +134,7 @@ namespace ESO_Discord_RichPresence_Client
                     if (this.FolderBrowser.ShowDialog() == DialogResult.OK)
                     {
                         EsoInstallLocation = this.FolderBrowser.SelectedPath;
-                        this.Settings.CustomEsoInstallLocation = this.FolderBrowser.SelectedPath;
-                        this.Settings.SaveToFile();
+                        this.Settings.Set("CustomEsoInstallLocation", this.FolderBrowser.SelectedPath);
                     }
 
                     else
@@ -237,46 +235,40 @@ namespace ESO_Discord_RichPresence_Client
 
         private void Box_Enabled_CheckedChanged(object sender, EventArgs e)
         {
-            if (this.Box_Enabled.Checked && !this.Settings.Enabled && Discord.CurrentCharacter != null)
+            if (this.Box_Enabled.Checked && !(bool)this.Settings.Get("Enabled") && Discord.CurrentCharacter != null)
             {
                 this.DiscordClient.Enable();
                 this.DiscordClient.UpdatePresence();
             }
 
-            else if (!this.Box_Enabled.Checked && this.Settings.Enabled && Discord.CurrentCharacter != null)
+            else if (!this.Box_Enabled.Checked && (bool)this.Settings.Get("Enabled") && Discord.CurrentCharacter != null)
                 this.DiscordClient.Disable();
 
-            this.Settings.Enabled = this.Box_Enabled.Checked;
-            this.Settings.SaveToFile();
+            this.Settings.Set("Enabled", this.Box_Enabled.Checked);
         }
 
         private void Box_CharacterName_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.ShowCharacterName = this.Box_CharacterName.Checked;
+            this.Settings.Set("ShowCharacterName", this.Box_CharacterName.Checked);
             if (Discord.CurrentCharacter != null)
                 this.DiscordClient.UpdatePresence();
-
-            this.Settings.SaveToFile();
         }
 
         private void Box_ShowGroup_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.ShowPartyInfo = this.Box_ShowGroup.Checked;
+            this.Settings.Set("ShowPartyInfo", this.Box_ShowGroup.Checked);
             if (Discord.CurrentCharacter != null)
                 this.DiscordClient.UpdatePresence();
-
-            this.Settings.SaveToFile();
         }
 
         private void Box_ToTray_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.ToTray = this.Box_ToTray.Checked;
-            this.Settings.SaveToFile();
+            this.Settings.Set("ToTray", this.Box_ToTray.Checked);
         }
 
         private void Main_Resize(object sender, EventArgs e)
         {
-            if (this.WindowState == FormWindowState.Minimized && this.Settings.ToTray)
+            if (this.WindowState == FormWindowState.Minimized && (bool)this.Settings.Get("ToTray"))
                 this.MinimiseToTray();
         }
 
@@ -285,11 +277,9 @@ namespace ESO_Discord_RichPresence_Client
             this.NotifyIcon1.Visible = true;
             this.Hide();
 
-            if (!this.Settings.MinimizedOnce)
+            if (!(bool)this.Settings.Get("MinimizedOnce"))
             {
-                this.Settings.MinimizedOnce = true;
-                this.Settings.SaveToFile();
-
+                this.Settings.Set("MinimizedOnce", true);
                 this.NotifyIcon1.ShowBalloonTip(2000);
             }
         }
@@ -305,14 +295,12 @@ namespace ESO_Discord_RichPresence_Client
         {
             this.TopMost = this.Box_StayTopMost.Checked;
 
-            this.Settings.StayTopMost = this.TopMost;
-            this.Settings.SaveToFile();
+            this.Settings.Set("StayTopMost", this.TopMost);
         }
 
         private void Box_AutoStart_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.AutoStart = this.Box_AutoStart.Checked;
-            this.Settings.SaveToFile();
+            this.Settings.Set("AutoStart", this.Box_AutoStart.Checked);
         }
 
         private void Box_AutoStart_MouseClick(object sender, MouseEventArgs e)
@@ -330,10 +318,9 @@ namespace ESO_Discord_RichPresence_Client
             if (e.KeyData == Keys.Enter)
             {
                 Control SteamIdTextBox = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
-                this.Settings.CustomSteamAppID = SteamIdTextBox.Text;
-                this.Settings.SaveToFile();
+                this.Settings.Set("CustomSteamAppID", SteamIdTextBox.Text);
 
-                this.TopMost = this.Settings.StayTopMost;
+                this.TopMost = (bool)this.Settings.Get("StayTopMost");
                 this.SteamAppIdForm.Hide();
             }
         }
@@ -341,10 +328,9 @@ namespace ESO_Discord_RichPresence_Client
         private void AppIdTextBox_LostFocus(object sender, EventArgs e)
         {
             Control SteamIdTextBox = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
-            this.Settings.CustomSteamAppID = SteamIdTextBox.Text;
-            this.Settings.SaveToFile();
+            this.Settings.Set("CustomSteamAppID", SteamIdTextBox.Text);
 
-            this.TopMost = this.Settings.StayTopMost;
+            this.TopMost = (bool)this.Settings.Get("StayTopMost");
             this.SteamAppIdForm.Hide();
         }
     }

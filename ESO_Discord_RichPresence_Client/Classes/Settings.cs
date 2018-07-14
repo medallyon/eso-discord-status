@@ -9,256 +9,86 @@ namespace ESO_Discord_RichPresence_Client
 {
     public class Settings : Dictionary<string, object>
     {
-        static string SaveLocation = Environment.ExpandEnvironmentVariables("%TEMP%\\ESO Discord Rich Presence Settings");
-        static string FileName = "Settings";
-
-        static Settings DefaultSettings = new Settings
+        static Dictionary<string, object> Default = new Dictionary<string, object>
         {
-            CustomEsoLocation = "",
-            CustomEsoInstallLocation = "",
-            CustomSteamAppID = "",
-            Enabled = true,
-            ShowCharacterName = true,
-            ShowPartyInfo = true,
-            ToTray = true,
-            StayTopMost = true,
-            AutoStart = false,
-            MinimizedOnce = false
+            { "CustomEsoLocation", String.Empty },
+            { "CustomEsoInstallLocation", String.Empty },
+            { "CustomSteamAppID", String.Empty },
+            { "Enabled", true },
+            { "ShowCharacterName", true },
+            { "ShowPartyInfo", true },
+            { "ToTray", true },
+            { "StayTopMost", true },
+            { "AutoStart", false },
+            { "MinimizedOnce", false }
         };
 
-        public string CustomEsoLocation
+        private readonly Properties.Settings ActualSettings = Properties.Settings.Default;
+
+        public new object this[string key]
         {
             get
             {
-                if (this.ContainsKey("CustomEsoLocation"))
-                    return (string)this["CustomEsoLocation"];
-                return Settings.DefaultSettings.CustomEsoLocation;
+                return base[key];
             }
             set
             {
-                this["CustomEsoLocation"] = value;
-            }
-        }
-
-        public string CustomEsoInstallLocation
-        {
-            get
-            {
-                if (this.ContainsKey("CustomEsoInstallLocation"))
-                    return (string)this["CustomEsoInstallLocation"];
-                return Settings.DefaultSettings.CustomEsoInstallLocation;
-            }
-            set
-            {
-                this["CustomEsoInstallLocation"] = value;
-            }
-        }
-
-        public string CustomSteamAppID
-        {
-            get
-            {
-                if (this.ContainsKey("CustomSteamAppID"))
-                    return (string)this["CustomSteamAppID"];
-                return Settings.DefaultSettings.CustomSteamAppID;
-            }
-            set
-            {
-                this["CustomSteamAppID"] = value;
-            }
-        }
-
-        public bool Enabled
-        {
-            get
-            {
-                if (this.ContainsKey("Enabled"))
-                    return Convert.ToBoolean(this["Enabled"]);
-                return Settings.DefaultSettings.Enabled;
-            }
-            set
-            {
-                this["Enabled"] = value;
-            }
-        }
-
-        public bool ShowCharacterName
-        {
-            get
-            {
-                if (this.ContainsKey("ShowCharacterName"))
-                    return Convert.ToBoolean(this["ShowCharacterName"]);
-                return Settings.DefaultSettings.ShowCharacterName;
-            }
-            set
-            {
-                this["ShowCharacterName"] = value;
-            }
-        }
-
-        public bool ShowPartyInfo
-        {
-            get
-            {
-                if (this.ContainsKey("ShowPartyInfo"))
-                    return Convert.ToBoolean(this["ShowPartyInfo"]);
-                return Settings.DefaultSettings.ShowPartyInfo;
-            }
-            set
-            {
-                this["ShowPartyInfo"] = value;
-            }
-        }
-
-        public bool ToTray
-        {
-            get
-            {
-                if (this.ContainsKey("ToTray"))
-                    return Convert.ToBoolean(this["ToTray"]);
-                return Settings.DefaultSettings.ToTray;
-            }
-            set
-            {
-                this["ToTray"] = value;
-            }
-        }
-
-        public bool StayTopMost
-        {
-            get
-            {
-                if (this.ContainsKey("StayTopMost"))
-                    return Convert.ToBoolean(this["StayTopMost"]);
-                return Settings.DefaultSettings.StayTopMost;
-            }
-            set
-            {
-                this["StayTopMost"] = value;
-            }
-        }
-
-        public bool AutoStart
-        {
-            get
-            {
-                if (this.ContainsKey("AutoStart"))
-                    return Convert.ToBoolean(this["AutoStart"]);
-                return Settings.DefaultSettings.AutoStart;
-            }
-            set
-            {
-                this["AutoStart"] = value;
-            }
-        }
-
-        public bool MinimizedOnce
-        {
-            get
-            {
-                if (this.ContainsKey("MinimizedOnce"))
-                    return Convert.ToBoolean(this["MinimizedOnce"]);
-                return Settings.DefaultSettings.MinimizedOnce;
-            }
-            set
-            {
-                this["MinimizedOnce"] = value;
-            }
-        }
-
-        public string[] RawSettings
-        {
-            get
-            {
-                string[] raw = new string[this.Count];
-                int count = 0;
-                foreach (KeyValuePair<string, object> setting in this)
-                    raw[count++] = $"{setting.Key}={setting.Value}";
-                return raw;
+                base[key] = value;
+                this.ActualSettings[key] = value;
+                this.ActualSettings.Save();
             }
         }
 
         public Settings()
         {
-            
+            this.Initialize();
         }
 
         public Settings(Dictionary<string, object> initialData)
         {
+            this.Initialize();
             this.Concat(initialData);
         }
 
         public Settings(string[] initialData)
         {
+            this.Initialize();
             foreach (string keyValuePair in initialData)
             {
                 string[] data = keyValuePair.Split('=');
                 if (data.Length == 2)
-                    this.Add(data[0], data[1]);
+                    this.Set(data[0], data[1]);
             }
         }
 
-        public static bool Exists()
+        private Settings Initialize()
         {
-            if (File.Exists($@"{Settings.SaveLocation}\\{Settings.FileName}"))
-                return true;
-            return false;
+            // populate the current Settings object
+            foreach (KeyValuePair<string, object> setting in Settings.Default)
+            {
+                if (!this.Has(setting.Key) && this.ActualSettings[setting.Key] != null)
+                    this.Set(setting.Key, this.ActualSettings[setting.Key]);
+            }
+
+            return this;
         }
 
-        public static Settings ReadFromFile()
+        public bool Has(string setting)
         {
-            if (!Settings.Exists())
-                return new Settings();
+            return this.ContainsKey(setting);
+        }
 
-            string[] existingSettings = null;
-            try
-            {
-                existingSettings = File.ReadAllLines($@"{Settings.SaveLocation}\\{Settings.FileName}");
-            }
-
-            catch (IOException error)
-            {
-                Console.WriteLine($"{error}: {error.Message}");
-            }
-            if (existingSettings != null)
-                return new Settings(existingSettings);
+        public object Get(string setting)
+        {
+            if (this.Has(setting))
+                return this[setting];
             else
-                return new Settings();
+                return null;
         }
 
-        public void Restore()
+        public void Set(string setting, object value)
         {
-            // populate this object with default values
-            Settings.DefaultSettings.ToList().ForEach(x => this[x.Key] = x.Value);
-            if (!Settings.Exists())
-                return;
-
-            try
-            {
-                // populate and overwrite this object with user-defined values
-                Settings.ReadFromFile().ToList().ForEach(x => this[x.Key] = x.Value);
-            }
-
-            catch (IOException error)
-            {
-                Console.WriteLine($"{error}: {error.Message}");
-            }
-        }
-
-        public void SaveToFile()
-        {
-            if (!Directory.Exists(Settings.SaveLocation))
-                Directory.CreateDirectory(Settings.SaveLocation);
-
-            try
-            {
-                File.WriteAllLines($@"{Settings.SaveLocation}\\{Settings.FileName}", this.RawSettings);
-            }
-            
-            catch (IOException error)
-            {
-                Console.WriteLine($"{error}: {error.Message}");
-            }
+            this[setting] = value;
         }
     }
 }

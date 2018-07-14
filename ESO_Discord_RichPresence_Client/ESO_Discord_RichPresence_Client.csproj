@@ -74,6 +74,7 @@
       <DependentUpon>SteamAppIdForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Classes\Zones.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="UnpackAddonFiles.cs" />
     <EmbeddedResource Include="Forms\Main.resx">
       <DependentUpon>Main.cs</DependentUpon>

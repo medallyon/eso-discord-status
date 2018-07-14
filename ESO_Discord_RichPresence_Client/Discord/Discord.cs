@@ -18,21 +18,21 @@ namespace ESO_Discord_RichPresence_Client
         {
             get
             {
-                return this.Main.Settings.Enabled;
+                return (bool)this.Main.Settings.Get("Enabled");
             }
         }
         private bool ShowCharacterName
         {
             get
             {
-                return this.Main.Settings.ShowCharacterName;
+                return (bool)this.Main.Settings.Get("ShowCharacterName");
             }
         }
         private bool ShowPartyInfo
         {
             get
             {
-                return this.Main.Settings.ShowPartyInfo;
+                return (bool)this.Main.Settings.Get("ShowPartyInfo");
             }
         }
 

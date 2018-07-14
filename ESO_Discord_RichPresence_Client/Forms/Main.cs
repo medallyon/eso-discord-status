@@ -20,7 +20,6 @@ namespace ESO_Discord_RichPresence_Client
         public const string DISCORD_CLIENT_ID = "453713122713272331";
         public const string ESO_STEAM_APP_ID = "306130";
         public const string ADDON_NAME = "DiscordRichPresence";
-        private static bool OnceMinimisedToTray = false;
 
         public Settings Settings;
         private Timer EsoTimer;
@@ -286,9 +285,11 @@ namespace ESO_Discord_RichPresence_Client
             this.NotifyIcon1.Visible = true;
             this.Hide();
 
-            if (!Main.OnceMinimisedToTray)
+            if (!this.Settings.MinimizedOnce)
             {
-                Main.OnceMinimisedToTray = true;
+                this.Settings.MinimizedOnce = true;
+                this.Settings.SaveToFile();
+
                 this.NotifyIcon1.ShowBalloonTip(2000);
             }
         }

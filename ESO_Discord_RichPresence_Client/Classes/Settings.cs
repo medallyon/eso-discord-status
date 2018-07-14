@@ -22,7 +22,8 @@ namespace ESO_Discord_RichPresence_Client
             ShowPartyInfo = true,
             ToTray = true,
             StayTopMost = true,
-            AutoStart = false
+            AutoStart = false,
+            MinimizedOnce = false
         };
 
         public string CustomEsoLocation
@@ -148,6 +149,20 @@ namespace ESO_Discord_RichPresence_Client
             set
             {
                 this["AutoStart"] = value;
+            }
+        }
+
+        public bool MinimizedOnce
+        {
+            get
+            {
+                if (this.ContainsKey("MinimizedOnce"))
+                    return Convert.ToBoolean(this["MinimizedOnce"]);
+                return Settings.DefaultSettings.MinimizedOnce;
+            }
+            set
+            {
+                this["MinimizedOnce"] = value;
             }
         }
 

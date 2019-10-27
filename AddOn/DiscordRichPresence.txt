@@ -1,7 +1,7 @@
 ## Title: Discord Rich Presence
 ## APIVersion: 100029
 ## Author: Medallyon
-## Version: 0.3.0
+## Version: 0.3.1
 ## SavedVariables: DiscordRichPresence_SavedVars
 ## DependsOn: LibAddonMenu-2.0
 

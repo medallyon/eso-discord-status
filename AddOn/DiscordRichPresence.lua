@@ -205,7 +205,6 @@ function DRP.handlers.OnPlayerActivated(event, isInitialLoad)
 
     if DRP.savedVars.ZO["settings"]["prioritySave"] == true
     then
-        CHAT_SYSTEM:AddMessage("[" .. DRP.meta.name .. "] Requesting Priority Save")
         GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DRP.name)
     end
 
@@ -228,11 +227,7 @@ function DRP.handlers.SaveQuestHandler(event, journalIndex)
     or zo["settings"]["prioritySave"] == false
     then return end
 
-    CHAT_SYSTEM:AddMessage("[" .. DRP.meta.name .. "] Journal Quest Name: " .. activeQuest)
-
     zo["activeQuest"] = activeQuest
-
-    CHAT_SYSTEM:AddMessage("[" .. DRP.meta.name .. "] Requesting Priority Save")
     GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DRP.name)
 end
 

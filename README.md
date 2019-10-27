@@ -41,6 +41,9 @@ This program currently only supports Windows. Visit the [Releases](https://githu
 
 + **The files immediately disappear when I unzip the addon to the Addons folder**
   + This is most likely because of an anti-virus program (Windows Defender, Malwarebytes, Avast, etc.). Create an exception for the unzipped folder along with the Client to stop this issue.
++ **I get an Error: `The target directory is not empty.`**
+  + Remove the Addon folder `DiscordRichPresence` and try installing the addon again.
+  + If the error persists, move the Client folder to your desktop, remove the Addon folder, and then try running the Client
 
 ## Contributing
 

@@ -97,7 +97,7 @@ namespace ESO_Discord_RichPresence_Client
             if (!this.Main.EsoIsRunning || character == null)
                 return;
             
-            this.PresenceData.state = ((character.InDungeon) ? (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $" as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : $"Venturing through a Delve") : "Roaming Tamriel");
+            this.PresenceData.state = ((character.InDungeon) ? (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $" as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : "Venturing through a Delve") : character.QuestName);
             this.PresenceData.details = $"{((this.ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
 
             if (this.ShowPartyInfo)
@@ -125,8 +125,8 @@ namespace ESO_Discord_RichPresence_Client
             else
             {
                 this.PresenceData.startTimestamp = this.Main.StartTimestamp;
-                this.PresenceData.smallImageKey = String.Empty;
-                this.PresenceData.smallImageText = String.Empty;
+                this.PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
+                this.PresenceData.smallImageText = character.Class;
             }
 
             DiscordRpc.UpdatePresence(this.PresenceData);

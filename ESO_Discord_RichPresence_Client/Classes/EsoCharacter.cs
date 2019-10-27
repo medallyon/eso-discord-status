@@ -116,6 +116,8 @@ namespace ESO_Discord_RichPresence_Client
         public string Battlegrounds_Name { get; set; }
         public string Battlegrounds_Description { get; set; }
 
+        public string QuestName { get; set; }
+
         public EsoCharacter(LuaTable character)
         {
             this.Name = (string)character["name"];
@@ -140,6 +142,8 @@ namespace ESO_Discord_RichPresence_Client
             this.Battlegrounds_GameType = (int)(double)character["bg_GameType"];
             this.Battlegrounds_Name = (string)character["bg_Name"];
             this.Battlegrounds_Description = (string)character["bg_Description"];
+
+            this.QuestName = (string)character["activeQuest"];
         }
     }
 }

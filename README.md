@@ -28,12 +28,6 @@ This program currently only supports Windows. Visit the [Releases](https://githu
 4. [Grab the dynamic binaries](https://github.com/discordapp/discord-rpc/releases) for the Discord RPC API and include them in your compiled directory
 6. Use to your liking!
 
-#### Hashes
-
-```
-DiscordStatusClient.exe: 71b60d12ad4e2c2cb83a981d9a5f783e
-```
-
 ## Usage
 
 1. [Install](#installation) this addon (use [Minion](https://minion.mmoui.com/) for ease of use)

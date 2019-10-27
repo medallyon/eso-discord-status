@@ -99,7 +99,7 @@ function DRP:CreateAddonMenu()
             reference = "DRP_LAM_control_prioritySave",
             name = "Use Priority Save",
             tooltip = "Automatically update presence when your active Zone or Activity changes.",
-            default = false,
+            default = true,
             getFunc = function()
                 return DRP.savedVars.ZO["settings"]["prioritySave"]
             end,

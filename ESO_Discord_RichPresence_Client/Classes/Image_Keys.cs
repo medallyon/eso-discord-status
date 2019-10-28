@@ -58,6 +58,7 @@ namespace ESO_Discord_RichPresence_Client
                 {
                     "Arx Corinium",
                     "Blackheart Haven",
+                    "Blackrose Prison",
                     "Blessed Crucible",
                     "Bloodroot Forge",
                     "City of Ash I",
@@ -69,6 +70,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Darkshade Caverns II",
                     "Depths of Malatar",
                     "Direfrost Keep",
+                    "Dragonstar Arena",
                     "Elden Hollow I",
                     "Elden Hollow II",
                     "Falkreath Hold",
@@ -78,6 +80,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Fungal Grotto II",
                     "Imperial City Prison",
                     "Lair of Maarselok",
+                    "Maelstrom Arena",
                     "March of Sacrifices",
                     "Moon Hunter Keep",
                     "Moongrave Fane",

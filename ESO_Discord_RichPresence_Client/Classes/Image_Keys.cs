@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ESO_Discord_RichPresence_Client
 {
-    public static class Zones
+    public static class Image_Keys
     {
         #region Data
         private static Dictionary<string, string[]> ZoneMap = new Dictionary<string, string[]>(3)
@@ -33,11 +33,16 @@ namespace ESO_Discord_RichPresence_Client
                     "Grahtwood",
                     "Greenshade",
                     "Hew's Bane",
+                    "Imperial City",
                     "Khenarthi's Roost",
                     "Malabal Tor",
+                    "Murkmire",
+                    "Norg-Tzel",
+                    "Northern Elsweyr",
                     "Reaper's March",
                     "Rivenspire",
                     "Shadowfen",
+                    "Southern Elsweyr",
                     "Stonefalls",
                     "Stormhaven",
                     "Stros M'Kai",
@@ -62,14 +67,20 @@ namespace ESO_Discord_RichPresence_Client
                     "Crypt of Hearts II",
                     "Darkshade Caverns I",
                     "Darkshade Caverns II",
+                    "Depths of Malatar",
                     "Direfrost Keep",
                     "Elden Hollow I",
                     "Elden Hollow II",
                     "Falkreath Hold",
                     "Fang Lair",
+                    "Frostvault",
                     "Fungal Grotto I",
                     "Fungal Grotto II",
                     "Imperial City Prison",
+                    "Lair of Maarselok",
+                    "March of Sacrifices",
+                    "Moon Hunter Keep",
+                    "Moongrave Fane",
                     "Ruins of Mazzatun",
                     "Scalecaller Peak",
                     "Selene's Web",
@@ -94,7 +105,8 @@ namespace ESO_Discord_RichPresence_Client
                     "Halls of Fabrication",
                     "Hel Ra Citadel",
                     "Maw of Lorkhaj",
-                    "Sanctum Ophidia"
+                    "Sanctum Ophidia",
+                    "Sunspire"
                 }
             }
         };

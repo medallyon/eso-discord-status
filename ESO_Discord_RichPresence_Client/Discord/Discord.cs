@@ -96,37 +96,46 @@ namespace ESO_Discord_RichPresence_Client
         {
             if (!this.Main.EsoIsRunning || character == null)
                 return;
-            
-            this.PresenceData.state = ((character.InDungeon) ? (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone) ? $"In a dungeon{((character.GroupRole != null) ? $" as {character.GroupRole}" : (character.PreferredGroupRoles.Length > 0) ? $" as {String.Join(", ", character.PreferredGroupRoles)}" : "")}" : "Venturing through a Delve") : character.QuestName);
+
+            // Character | Account (Level|CP)
             this.PresenceData.details = $"{((this.ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
+
+            // State + Image + Time Data
+
+            this.PresenceData.state = character.QuestName;
+
+            this.PresenceData.largeImageKey = Image_Keys.Locations.Get(character.Zone);
+            this.PresenceData.largeImageText = character.Zone;
+            this.PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
+            this.PresenceData.smallImageText = character.Class;
+
+            this.PresenceData.startTimestamp = this.Main.StartTimestamp;
+
+            if (character.InDungeon)
+            {
+                this.PresenceData.largeImageText = character.Dungeon;
+
+                if (Image_Keys.Trials.IsValid(character.Zone) || Image_Keys.Dungeons.IsValid(character.Zone))
+                {
+                    this.PresenceData.state = $"In a dungeon{((character.GroupRole != null) ? $" as a {character.GroupRole}" : "")}";
+
+                    this.PresenceData.largeImageKey = (Image_Keys.Trials.IsValid(character.Dungeon)) ? Image_Keys.Trials.Get(character.Dungeon) : Image_Keys.Dungeons.Get(character.Dungeon);
+                    this.PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
+                    this.PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
+
+                    this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                }
+            }
+
+            // Party Data
+
+            this.PresenceData.partyMax = 0;
+            this.PresenceData.partySize = 0;
 
             if (this.ShowPartyInfo)
             {
                 this.PresenceData.partyMax = ((character.GroupSize <= 4) ? 4 : ((character.GroupSize <= 12) ? 12 : 24));
                 this.PresenceData.partySize = character.GroupSize;
-            }
-
-            else
-            {
-                this.PresenceData.partyMax = 0;
-                this.PresenceData.partySize = 0;
-            }
-
-            this.PresenceData.largeImageKey = ((character.InDungeon) ? ((Zones.Trials.IsValid(character.Zone)) ? Zones.Trials.Get(character.Zone) : Zones.Dungeons.Get(character.Zone)) : Zones.Locations.Get(character.Zone));
-            this.PresenceData.largeImageText = character.Zone;
-            
-            if (character.InDungeon && (Zones.Trials.IsValid(character.Zone) || Zones.Dungeons.IsValid(character.Zone)))
-            {
-                this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-                this.PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
-                this.PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
-            }
-
-            else
-            {
-                this.PresenceData.startTimestamp = this.Main.StartTimestamp;
-                this.PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
-                this.PresenceData.smallImageText = character.Class;
             }
 
             DiscordRpc.UpdatePresence(this.PresenceData);

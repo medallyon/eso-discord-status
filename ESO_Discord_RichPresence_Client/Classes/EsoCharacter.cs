@@ -72,25 +72,8 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
 
-        public string[] PreferredGroupRoles
-        {
-            get
-            {
-                var preferred = new Dictionary<string, bool>
-                {
-                    { "DPS", this.PrefersDPS },
-                    { "Tank", this.PrefersTank },
-                    { "Healer", this.PrefersHeal }
-                };
-
-                foreach (var role in preferred.Where(r => !r.Value).ToList())
-                    preferred.Remove(role.Key);
-
-                return preferred.Keys.ToArray();
-            }
-        }
-
         public bool InDungeon { get; set; }
+        public string Dungeon { get; set; }
 
         private int dungeonDifficultyInt;
         public string DungeonDifficulty
@@ -108,9 +91,6 @@ namespace ESO_Discord_RichPresence_Client
                 }
             }
         }
-        public bool PrefersDPS { get; set; }
-        public bool PrefersTank { get; set; }
-        public bool PrefersHeal { get; set; }
 
         public int Battlegrounds_GameType { get; set; }
         public string Battlegrounds_Name { get; set; }
@@ -135,15 +115,18 @@ namespace ESO_Discord_RichPresence_Client
             this.groupRoleInt = (int)(double)character["groupRole"];
             this.InDungeon = (bool)character["inDungeon"];
             this.dungeonDifficultyInt = (int)(double)character["isDungeonVeteran"];
-            this.PrefersDPS = (bool)character["prefersDPS"];
-            this.PrefersTank = (bool)character["prefersTank"];
-            this.PrefersHeal = (bool)character["prefersHeal"];
 
             this.Battlegrounds_GameType = (int)(double)character["bg_GameType"];
             this.Battlegrounds_Name = (string)character["bg_Name"];
             this.Battlegrounds_Description = (string)character["bg_Description"];
 
             this.QuestName = (string)character["activeQuest"];
+
+            if (this.InDungeon)
+            {
+                this.Dungeon = this.Zone;
+                this.Zone = (string)character["parentZone"];
+            }
         }
     }
 }

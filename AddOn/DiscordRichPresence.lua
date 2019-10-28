@@ -158,6 +158,7 @@ function DRP:StoreCharacterData()
     zo["class"] = GetUnitClass(u)
     zo["alliance"] = GetUnitAlliance(u)
     zo["zone"] = GetUnitZone(u)
+    zo["parentZone"] = GetZoneNameById(GetParentZoneId(GetZoneId(GetCurrentMapZoneIndex())))
     zo["isChampion"] = IsUnitChampion(u)
     zo["level"] = GetUnitEffectiveChampionPoints(u)
     if zo["isChampion"] == false then
@@ -170,7 +171,7 @@ function DRP:StoreCharacterData()
     zo["inDungeon"] = IsUnitInDungeon(u)
     zo["groupRole"] = GetGroupMemberAssignedRole(u)
     zo["isDungeonVeteran"] = GetCurrentZoneDungeonDifficulty()
-    zo["prefersDPS"], zo["prefersTank"], zo["prefersHeal"] = GetGroupMemberRoles(u)
+    zo["dungeonRole"] = GetGroupMemberSelectedRole(u)
 
     -- PvP-related Information
     bg = GetCurrentBattlegroundId()

@@ -9,6 +9,7 @@ namespace ESO_Discord_RichPresence_Client
     class Discord : DiscordRpc
     {
         public static EsoCharacter CurrentCharacter;
+        private EsoCharacter _latestInstance;
 
         private string ApplicationID { get; set; }
         private string OptionalSteamAppID { get; set; }
@@ -115,15 +116,22 @@ namespace ESO_Discord_RichPresence_Client
             {
                 this.PresenceData.largeImageText = character.Dungeon;
 
-                if (Image_Keys.Trials.IsValid(character.Zone) || Image_Keys.Dungeons.IsValid(character.Zone))
+                if (Image_Keys.Trials.IsValid(character.Dungeon) || Image_Keys.Dungeons.IsValid(character.Dungeon))
                 {
                     this.PresenceData.state = $"In a dungeon{((character.GroupRole != null) ? $" as a {character.GroupRole}" : "")}";
+
+                    // Don't update timestamp if in same dungeon instance
+                    if (this._latestInstance != null
+                        && !(this._latestInstance.InDungeon
+                            && this._latestInstance.Dungeon == character.Dungeon
+                            && this._latestInstance.DungeonDifficulty == character.DungeonDifficulty
+                        )
+                    )
+                        this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
                     this.PresenceData.largeImageKey = (Image_Keys.Trials.IsValid(character.Dungeon)) ? Image_Keys.Trials.Get(character.Dungeon) : Image_Keys.Dungeons.Get(character.Dungeon);
                     this.PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
                     this.PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
-
-                    this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
                 }
             }
 
@@ -139,6 +147,7 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             DiscordRpc.UpdatePresence(this.PresenceData);
+            this._latestInstance = character;
         }
 
         private void OnReady(ref DiscordUser connectedUser)

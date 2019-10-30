@@ -46,6 +46,7 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
         public string Zone { get; set; }
+        public string SubZone { get; set; }
 
         public bool IsChampion { get; set; }
         public int Level { get; set; }
@@ -107,6 +108,7 @@ namespace ESO_Discord_RichPresence_Client
             this.genderInt = (int)(double)character["gender"];
             this.allianceInt = (int)(double)character["alliance"];
             this.Zone = (string)character["zone"];
+            this.SubZone = (string)character["subZone"];
             this.IsChampion = (bool)character["isChampion"];
             this.Level = (int)(double)character["level"];
 

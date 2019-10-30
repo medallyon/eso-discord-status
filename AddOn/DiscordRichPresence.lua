@@ -32,6 +32,7 @@ DRP.savedVars.defaults = {
     ["level"] = nil,
     ["alliance"] = nil,
     ["zone"] = nil,
+    ["subZone"] = nil,
 
     ["isgrouped"] = nil,
     ["inDungeon"] = nil,
@@ -159,6 +160,7 @@ function DRP:StoreCharacterData()
     zo["alliance"] = GetUnitAlliance(u)
     zo["zone"] = GetUnitZone(u)
     zo["parentZone"] = GetZoneNameById(GetParentZoneId(GetZoneId(GetCurrentMapZoneIndex())))
+    zo["subZone"] = GetPlayerActiveSubzoneName()
     zo["isChampion"] = IsUnitChampion(u)
     zo["level"] = GetUnitEffectiveChampionPoints(u)
     if zo["isChampion"] == false then

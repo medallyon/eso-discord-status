@@ -106,7 +106,7 @@ namespace ESO_Discord_RichPresence_Client
             this.PresenceData.state = character.QuestName;
 
             this.PresenceData.largeImageKey = Image_Keys.Locations.Get(character.Zone);
-            this.PresenceData.largeImageText = character.Zone;
+            this.PresenceData.largeImageText = (character.SubZone != null && character.SubZone.Length > 0) ? character.SubZone : character.Zone;
             this.PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
             this.PresenceData.smallImageText = character.Class;
 
@@ -118,7 +118,7 @@ namespace ESO_Discord_RichPresence_Client
 
                 if (Image_Keys.Trials.IsValid(character.Dungeon) || Image_Keys.Dungeons.IsValid(character.Dungeon))
                 {
-                    this.PresenceData.state = $"In a dungeon{((character.GroupRole != null) ? $" as a {character.GroupRole}" : "")}";
+                    this.PresenceData.state = (character.GroupRole != null) ? character.GroupRole : "";
 
                     // Don't update timestamp if in same dungeon instance
                     if (this._latestInstance != null

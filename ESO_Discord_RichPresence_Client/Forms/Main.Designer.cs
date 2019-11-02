@@ -37,8 +37,12 @@
             this.Box_StayTopMost = new System.Windows.Forms.CheckBox();
             this.Label_EsoIsRunning = new System.Windows.Forms.Label();
             this.Box_ToTray = new System.Windows.Forms.CheckBox();
-            this.NotifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
+            this.TrayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.Box_AutoStart = new System.Windows.Forms.CheckBox();
+            this.TrayContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.TrayContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // Box_Enabled
@@ -121,14 +125,16 @@
             this.Box_ToTray.UseVisualStyleBackColor = true;
             this.Box_ToTray.CheckedChanged += new System.EventHandler(this.Box_ToTray_CheckedChanged);
             // 
-            // NotifyIcon1
+            // TrayIcon
             // 
-            this.NotifyIcon1.BalloonTipText = "This program has now been minimized to the tray. Double-click to bring me back up" +
+            this.TrayIcon.BalloonTipText = "This program has now been minimized to the tray. Double-click to bring me back up" +
     "!";
-            this.NotifyIcon1.BalloonTipTitle = "Discord Status Updater";
-            this.NotifyIcon1.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon1.Icon")));
-            this.NotifyIcon1.Text = "Discord Status Updater";
-            this.NotifyIcon1.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon1_MouseDoubleClick);
+            this.TrayIcon.BalloonTipTitle = "Discord Status Updater";
+            this.TrayIcon.ContextMenuStrip = this.TrayContextMenu;
+            this.TrayIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("TrayIcon.Icon")));
+            this.TrayIcon.Text = "Discord Status Updater";
+            this.TrayIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseClick);
+            this.TrayIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseDoubleClick);
             // 
             // Box_AutoStart
             // 
@@ -141,6 +147,28 @@
             this.Box_AutoStart.UseVisualStyleBackColor = true;
             this.Box_AutoStart.CheckedChanged += new System.EventHandler(this.Box_AutoStart_CheckedChanged);
             this.Box_AutoStart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Box_AutoStart_MouseClick);
+            // 
+            // TrayContextMenu
+            // 
+            this.TrayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.showToolStripMenuItem,
+            this.quitToolStripMenuItem});
+            this.TrayContextMenu.Name = "TrayContextMenu";
+            this.TrayContextMenu.Size = new System.Drawing.Size(104, 48);
+            // 
+            // showToolStripMenuItem
+            // 
+            this.showToolStripMenuItem.Name = "showToolStripMenuItem";
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.showToolStripMenuItem.Text = "Show";
+            this.showToolStripMenuItem.Click += new System.EventHandler(this.ShowToolStripMenuItem_Click);
+            // 
+            // quitToolStripMenuItem
+            // 
+            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.Click += new System.EventHandler(this.QuitToolStripMenuItem_Click);
             // 
             // Main
             // 
@@ -165,6 +193,7 @@
             this.TopMost = true;
             this.Load += new System.EventHandler(this.Main_Load);
             this.Resize += new System.EventHandler(this.Main_Resize);
+            this.TrayContextMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -179,8 +208,11 @@
         private System.Windows.Forms.CheckBox Box_StayTopMost;
         private System.Windows.Forms.Label Label_EsoIsRunning;
         private System.Windows.Forms.CheckBox Box_ToTray;
-        private System.Windows.Forms.NotifyIcon NotifyIcon1;
+        private System.Windows.Forms.NotifyIcon TrayIcon;
         private System.Windows.Forms.CheckBox Box_AutoStart;
+        private System.Windows.Forms.ContextMenuStrip TrayContextMenu;
+        private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
     }
 }
 

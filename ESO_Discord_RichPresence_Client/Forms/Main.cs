@@ -298,21 +298,14 @@ namespace ESO_Discord_RichPresence_Client
 
         private void MinimiseToTray()
         {
-            this.NotifyIcon1.Visible = true;
+            this.TrayIcon.Visible = true;
             this.Hide();
 
             if (!(bool)this.Settings.Get("MinimizedOnce"))
             {
                 this.Settings.Set("MinimizedOnce", true);
-                this.NotifyIcon1.ShowBalloonTip(2000);
+                this.TrayIcon.ShowBalloonTip(2000);
             }
-        }
-
-        private void NotifyIcon1_MouseDoubleClick(object sender, EventArgs e)
-        {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
-            this.NotifyIcon1.Visible = false;
         }
 
         private void Box_StayTopMost_CheckedChanged(object sender, EventArgs e)
@@ -356,6 +349,37 @@ namespace ESO_Discord_RichPresence_Client
 
             this.TopMost = (bool)this.Settings.Get("StayTopMost");
             this.SteamAppIdForm.Hide();
+        }
+
+        private void ShowClient()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.TrayIcon.Visible = false;
+        }
+
+        private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.ShowClient();
+        }
+
+        private void TrayIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            this.TrayContextMenu.Show(Cursor.Position);
+        }
+
+        private void ShowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.TrayContextMenu.Hide();
+            this.ShowClient();
+        }
+
+        private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

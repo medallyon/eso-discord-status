@@ -35,11 +35,35 @@ namespace ESO_Discord_RichPresence_Client
             InitializeComponent();
         }
 
+        private bool IsEsoRunning()
+        {
+            Process[] pName = Process.GetProcessesByName("eso64");
+            if (pName.Length > 0)
+                return true;
+
+            return false;
+        }
+
+        private void HandleDuplicateClient()
+        {
+            Process[] pName = Process.GetProcessesByName("ESO_Discord_RichPresence_Client");
+            if (pName.Length == 1)
+                return;
+
+            if ((bool)this.Settings.Get("AutoStart"))
+            {
+                this.StartESO();
+                Application.Exit();
+            }
+        }
+
         private void Main_Load(object sender, EventArgs e)
         {
             this.Text = "ESO Discord Status";
 
             this.Settings = new Settings();
+
+            this.HandleDuplicateClient();
 
             this.DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
             this.SavedVars = new SavedVariables(this, this.DiscordClient, this.FolderBrowser);
@@ -89,8 +113,7 @@ namespace ESO_Discord_RichPresence_Client
 
         private void StartESO()
         {
-            Process[] pName = Process.GetProcessesByName("eso64");
-            if (pName.Length > 0)
+            if (this.IsEsoRunning())
                 return;
 
             if (this.Settings.Get("CustomSteamAppID") != null && this.Settings.Get("CustomSteamAppID").ToString().Length >= 5)
@@ -120,7 +143,7 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             EsoRegistryKey = Registry.LocalMachine.OpenSubKey(EsoBaseKey);
-            string EsoInstallLocation = String.Empty;
+            string EsoInstallLocation;
 
             // ESO cannot be found
             if (EsoRegistryKey == null)

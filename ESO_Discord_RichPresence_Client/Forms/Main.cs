@@ -27,19 +27,43 @@ namespace ESO_Discord_RichPresence_Client
         private Discord DiscordClient;
         private SteamAppIdForm SteamAppIdForm;
 
-        public bool EsoIsRunning { get; set; } = false;
         public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+        public bool EsoIsRunning { get; set; } = false;
+        public bool EsoRanOnce { get; set; } = false;
+        public bool JustMinimized { get; set; } = false;
 
         public Main()
         {
             InitializeComponent();
         }
 
+        private bool IsEsoRunning()
+        {
+            Process[] pName = Process.GetProcessesByName("eso64");
+            if (pName.Length > 0)
+                return true;
+
+            return false;
+        }
+
+        private void HandleDuplicateClient()
+        {
+            Process[] pName = Process.GetProcessesByName("ESO_Discord_RichPresence_Client");
+            if (pName.Length == 1)
+                return;
+
+            if ((bool)this.Settings.Get("AutoStart"))
+            {
+                this.StartESO();
+                Application.Exit();
+            }
+        }
+
         private void Main_Load(object sender, EventArgs e)
         {
-            this.Text = "ESO Discord Status";
-
             this.Settings = new Settings();
+
+            this.HandleDuplicateClient();
 
             this.DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
             this.SavedVars = new SavedVariables(this, this.DiscordClient, this.FolderBrowser);
@@ -79,6 +103,7 @@ namespace ESO_Discord_RichPresence_Client
             this.Box_ToTray.Checked = (bool)this.Settings.Get("ToTray");
             this.Box_StayTopMost.Checked = (bool)this.Settings.Get("StayTopMost");
             this.Box_AutoStart.Checked = (bool)this.Settings.Get("AutoStart");
+            this.Box_AutoExit.Checked = (bool)this.Settings.Get("AutoExit");
 
             if (this.Settings.Get("CustomSteamAppID") != null)
                 this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)this.Settings.Get("CustomSteamAppID");
@@ -89,8 +114,7 @@ namespace ESO_Discord_RichPresence_Client
 
         private void StartESO()
         {
-            Process[] pName = Process.GetProcessesByName("eso64");
-            if (pName.Length > 0)
+            if (this.IsEsoRunning())
                 return;
 
             if (this.Settings.Get("CustomSteamAppID") != null && this.Settings.Get("CustomSteamAppID").ToString().Length >= 5)
@@ -120,7 +144,7 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             EsoRegistryKey = Registry.LocalMachine.OpenSubKey(EsoBaseKey);
-            string EsoInstallLocation = String.Empty;
+            string EsoInstallLocation;
 
             // ESO cannot be found
             if (EsoRegistryKey == null)
@@ -162,13 +186,12 @@ namespace ESO_Discord_RichPresence_Client
 
         private void InitEsoTimer()
         {
-            this.EsoTimer = new Timer();
-            this.EsoTimer.Tick += new EventHandler(UpdateEsoText);
-            this.EsoTimer.Interval = 1000;
+            this.EsoTimer = new Timer() { Interval = 1000 };
+            this.EsoTimer.Tick += new EventHandler(this.UpdateClientStatus);
             this.EsoTimer.Start();
         }
 
-        private void UpdateEsoText(object sender, EventArgs e)
+        private void UpdateClientStatus(object sender, EventArgs e)
         {
             if (!SavedVariables.Exists)
             {
@@ -182,8 +205,9 @@ namespace ESO_Discord_RichPresence_Client
             {
                 this.EsoIsRunning = true;
                 this.DiscordClient.Enable();
-                this.DiscordClient.UpdatePresence();
+
                 this.StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                this.DiscordClient.UpdatePresence();
             }
 
             else if ((processes.Length == 0 && this.EsoIsRunning) || processes.Length == 0)
@@ -193,17 +217,36 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             if (this.EsoIsRunning)
-                this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen, FontStyle.Regular);
+            {
+                if (!this.EsoRanOnce)
+                    this.EsoRanOnce = true;
+
+                if (!this.JustMinimized)
+                {
+                    this.JustMinimized = true;
+                    this.Minimize();
+                }
+
+                this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
+            }
+
             else
-                this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick, FontStyle.Regular);
+            {
+                if ((bool)this.Settings.Get("AutoExit") && this.EsoRanOnce)
+                    Application.Exit();
+
+                this.JustMinimized = false;
+
+                this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
+            }
         }
 
         public void UpdateStatusField(string status)
         {
-            this.UpdateStatusField(status, Color.DarkGray, FontStyle.Regular);
+            this.UpdateStatusField(status, Color.DarkGray);
         }
 
-        public void UpdateStatusField(string status, Color newColor, FontStyle style)
+        public void UpdateStatusField(string status, Color newColor, FontStyle style = FontStyle.Regular)
         {
             if (this.Label_EsoIsRunning.InvokeRequired)
             {
@@ -269,26 +312,27 @@ namespace ESO_Discord_RichPresence_Client
         private void Main_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized && (bool)this.Settings.Get("ToTray"))
-                this.MinimiseToTray();
+                this.MinimizeToTray();
         }
 
-        private void MinimiseToTray()
+        private void Minimize()
         {
-            this.NotifyIcon1.Visible = true;
+            if ((bool)this.Settings.Get("ToTray"))
+                this.MinimizeToTray();
+            else
+                this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void MinimizeToTray()
+        {
+            this.TrayIcon.Visible = true;
             this.Hide();
 
             if (!(bool)this.Settings.Get("MinimizedOnce"))
             {
                 this.Settings.Set("MinimizedOnce", true);
-                this.NotifyIcon1.ShowBalloonTip(2000);
+                this.TrayIcon.ShowBalloonTip(2000);
             }
-        }
-
-        private void NotifyIcon1_MouseDoubleClick(object sender, EventArgs e)
-        {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
-            this.NotifyIcon1.Visible = false;
         }
 
         private void Box_StayTopMost_CheckedChanged(object sender, EventArgs e)
@@ -301,6 +345,11 @@ namespace ESO_Discord_RichPresence_Client
         private void Box_AutoStart_CheckedChanged(object sender, EventArgs e)
         {
             this.Settings.Set("AutoStart", this.Box_AutoStart.Checked);
+        }
+
+        private void Box_AutoExit_CheckedChanged(object sender, EventArgs e)
+        {
+            this.Settings.Set("AutoExit", this.Box_AutoExit.Checked);
         }
 
         private void Box_AutoStart_MouseClick(object sender, MouseEventArgs e)
@@ -332,6 +381,37 @@ namespace ESO_Discord_RichPresence_Client
 
             this.TopMost = (bool)this.Settings.Get("StayTopMost");
             this.SteamAppIdForm.Hide();
+        }
+
+        private void ShowClient()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.TrayIcon.Visible = false;
+        }
+
+        private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            this.ShowClient();
+        }
+
+        private void TrayIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            this.TrayContextMenu.Show(Cursor.Position);
+        }
+
+        private void ShowToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.TrayContextMenu.Hide();
+            this.ShowClient();
+        }
+
+        private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Application.Exit();
         }
     }
 }

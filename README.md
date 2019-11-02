@@ -2,7 +2,9 @@
 
 This little program is made using the .Net 4.6.1 framework and sends Rich Presence data to your local Discord client, making your status say more than just "Playing **Elder Scrolls Online**", including info about your current location, your level, your current party, and more! While running, your presence should look like this:
 
-![image](https://i.imgur.com/RMZ5pnS.png)
+<p align="center">
+  <img src="https://i.imgur.com/iAYoWnK.png">
+</p>
 
 ## Installation
 

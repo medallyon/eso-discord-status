@@ -28,6 +28,7 @@ namespace ESO_Discord_RichPresence_Client
         private SteamAppIdForm SteamAppIdForm;
 
         public bool EsoIsRunning { get; set; } = false;
+        public bool EsoRanOnce { get; set; } = false;
         public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
         public Main()
@@ -101,6 +102,7 @@ namespace ESO_Discord_RichPresence_Client
             this.Box_ToTray.Checked = (bool)this.Settings.Get("ToTray");
             this.Box_StayTopMost.Checked = (bool)this.Settings.Get("StayTopMost");
             this.Box_AutoStart.Checked = (bool)this.Settings.Get("AutoStart");
+            this.Box_AutoExit.Checked = (bool)this.Settings.Get("AutoExit");
 
             if (this.Settings.Get("CustomSteamAppID") != null)
                 this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)this.Settings.Get("CustomSteamAppID");
@@ -215,17 +217,28 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             if (this.EsoIsRunning)
-                this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen, FontStyle.Regular);
+            {
+                if (!this.EsoRanOnce)
+                    this.EsoRanOnce = true;
+
+                this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
+            }
+
             else
-                this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick, FontStyle.Regular);
+            {
+                if ((bool)this.Settings.Get("AutoExit") && this.EsoRanOnce)
+                    Application.Exit();
+
+                this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
+            }
         }
 
         public void UpdateStatusField(string status)
         {
-            this.UpdateStatusField(status, Color.DarkGray, FontStyle.Regular);
+            this.UpdateStatusField(status, Color.DarkGray);
         }
 
-        public void UpdateStatusField(string status, Color newColor, FontStyle style)
+        public void UpdateStatusField(string status, Color newColor, FontStyle style = FontStyle.Regular)
         {
             if (this.Label_EsoIsRunning.InvokeRequired)
             {
@@ -316,6 +329,11 @@ namespace ESO_Discord_RichPresence_Client
         private void Box_AutoStart_CheckedChanged(object sender, EventArgs e)
         {
             this.Settings.Set("AutoStart", this.Box_AutoStart.Checked);
+        }
+
+        private void Box_AutoExit_CheckedChanged(object sender, EventArgs e)
+        {
+            this.Settings.Set("AutoExit", this.Box_AutoExit.Checked);
         }
 
         private void Box_AutoStart_MouseClick(object sender, MouseEventArgs e)

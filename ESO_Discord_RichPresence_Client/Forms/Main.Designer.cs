@@ -42,7 +42,7 @@
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Box_AutoStart = new System.Windows.Forms.CheckBox();
-            this.Box_AutoClose = new System.Windows.Forms.CheckBox();
+            this.Box_AutoExit = new System.Windows.Forms.CheckBox();
             this.Tooltip_Main = new System.Windows.Forms.ToolTip(this.components);
             this.TrayContextMenu.SuspendLayout();
             this.SuspendLayout();
@@ -194,18 +194,19 @@
             this.Box_AutoStart.CheckedChanged += new System.EventHandler(this.Box_AutoStart_CheckedChanged);
             this.Box_AutoStart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Box_AutoStart_MouseClick);
             // 
-            // Box_AutoClose
+            // Box_AutoExit
             // 
-            this.Box_AutoClose.AccessibleDescription = "Automatically closes this client when you exit ESO.";
-            this.Box_AutoClose.AccessibleName = "Auto Exit";
-            this.Box_AutoClose.AutoSize = true;
-            this.Box_AutoClose.Location = new System.Drawing.Point(240, 144);
-            this.Box_AutoClose.Name = "Box_AutoClose";
-            this.Box_AutoClose.Size = new System.Drawing.Size(68, 17);
-            this.Box_AutoClose.TabIndex = 7;
-            this.Box_AutoClose.Text = "Auto Exit";
-            this.Tooltip_Main.SetToolTip(this.Box_AutoClose, "Automatically closes this client when you exit ESO.");
-            this.Box_AutoClose.UseVisualStyleBackColor = true;
+            this.Box_AutoExit.AccessibleDescription = "Automatically closes this client when you exit ESO.";
+            this.Box_AutoExit.AccessibleName = "Auto Exit";
+            this.Box_AutoExit.AutoSize = true;
+            this.Box_AutoExit.Location = new System.Drawing.Point(240, 144);
+            this.Box_AutoExit.Name = "Box_AutoExit";
+            this.Box_AutoExit.Size = new System.Drawing.Size(68, 17);
+            this.Box_AutoExit.TabIndex = 7;
+            this.Box_AutoExit.Text = "Auto Exit";
+            this.Tooltip_Main.SetToolTip(this.Box_AutoExit, "Automatically closes this client when you exit ESO.");
+            this.Box_AutoExit.UseVisualStyleBackColor = true;
+            this.Box_AutoExit.CheckedChanged += new System.EventHandler(this.Box_AutoExit_CheckedChanged);
             // 
             // Main
             // 
@@ -213,7 +214,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(62)))));
             this.ClientSize = new System.Drawing.Size(354, 180);
-            this.Controls.Add(this.Box_AutoClose);
+            this.Controls.Add(this.Box_AutoExit);
             this.Controls.Add(this.Box_AutoStart);
             this.Controls.Add(this.Box_ToTray);
             this.Controls.Add(this.Label_EsoIsRunning);
@@ -251,7 +252,7 @@
         private System.Windows.Forms.ContextMenuStrip TrayContextMenu;
         private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
-        private System.Windows.Forms.CheckBox Box_AutoClose;
+        private System.Windows.Forms.CheckBox Box_AutoExit;
         private System.Windows.Forms.ToolTip Tooltip_Main;
     }
 }

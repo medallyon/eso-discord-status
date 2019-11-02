@@ -9,7 +9,7 @@ namespace ESO_Discord_RichPresence_Client
 {
     public class Settings : Dictionary<string, object>
     {
-        static Dictionary<string, object> Default = new Dictionary<string, object>
+        static readonly Dictionary<string, object> Default = new Dictionary<string, object>
         {
             { "CustomEsoLocation", String.Empty },
             { "CustomEsoInstallLocation", String.Empty },
@@ -20,6 +20,7 @@ namespace ESO_Discord_RichPresence_Client
             { "ToTray", true },
             { "StayTopMost", true },
             { "AutoStart", false },
+            { "AutoExit", false },
             { "MinimizedOnce", false }
         };
 

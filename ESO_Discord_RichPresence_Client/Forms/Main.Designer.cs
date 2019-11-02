@@ -38,15 +38,19 @@
             this.Label_EsoIsRunning = new System.Windows.Forms.Label();
             this.Box_ToTray = new System.Windows.Forms.CheckBox();
             this.TrayIcon = new System.Windows.Forms.NotifyIcon(this.components);
-            this.Box_AutoStart = new System.Windows.Forms.CheckBox();
             this.TrayContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Box_AutoStart = new System.Windows.Forms.CheckBox();
+            this.Box_AutoClose = new System.Windows.Forms.CheckBox();
+            this.Tooltip_Main = new System.Windows.Forms.ToolTip(this.components);
             this.TrayContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // Box_Enabled
             // 
+            this.Box_Enabled.AccessibleDescription = "Whether Discord Rich Presence should be shown on your profile.";
+            this.Box_Enabled.AccessibleName = "Enabled";
             this.Box_Enabled.AutoSize = true;
             this.Box_Enabled.Checked = true;
             this.Box_Enabled.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -55,6 +59,7 @@
             this.Box_Enabled.Size = new System.Drawing.Size(65, 17);
             this.Box_Enabled.TabIndex = 0;
             this.Box_Enabled.Text = "Enabled";
+            this.Tooltip_Main.SetToolTip(this.Box_Enabled, "Whether Discord Rich Presence should be shown on your profile.");
             this.Box_Enabled.UseVisualStyleBackColor = true;
             this.Box_Enabled.CheckedChanged += new System.EventHandler(this.Box_Enabled_CheckedChanged);
             // 
@@ -64,6 +69,9 @@
             // 
             // Box_CharacterName
             // 
+            this.Box_CharacterName.AccessibleDescription = "Displays your active character\'s name if enabled or your account name if disabled" +
+    ".";
+            this.Box_CharacterName.AccessibleName = "Use Character Name";
             this.Box_CharacterName.AutoSize = true;
             this.Box_CharacterName.Checked = true;
             this.Box_CharacterName.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -72,11 +80,15 @@
             this.Box_CharacterName.Size = new System.Drawing.Size(125, 17);
             this.Box_CharacterName.TabIndex = 1;
             this.Box_CharacterName.Text = "Use Character Name";
+            this.Tooltip_Main.SetToolTip(this.Box_CharacterName, "Displays your active character\'s name if enabled or your account name if disabled" +
+        ".");
             this.Box_CharacterName.UseVisualStyleBackColor = true;
             this.Box_CharacterName.CheckedChanged += new System.EventHandler(this.Box_CharacterName_CheckedChanged);
             // 
             // Box_ShowGroup
             // 
+            this.Box_ShowGroup.AccessibleDescription = "Displays your active Party if enabled. Has no effect if you\'re not in a Party.";
+            this.Box_ShowGroup.AccessibleName = "Show Party Info";
             this.Box_ShowGroup.AutoSize = true;
             this.Box_ShowGroup.Checked = true;
             this.Box_ShowGroup.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -85,11 +97,14 @@
             this.Box_ShowGroup.Size = new System.Drawing.Size(101, 17);
             this.Box_ShowGroup.TabIndex = 2;
             this.Box_ShowGroup.Text = "Show Party Info";
+            this.Tooltip_Main.SetToolTip(this.Box_ShowGroup, "Displays your active Party if enabled. Has no effect if you\'re not in a Party.");
             this.Box_ShowGroup.UseVisualStyleBackColor = true;
             this.Box_ShowGroup.CheckedChanged += new System.EventHandler(this.Box_ShowGroup_CheckedChanged);
             // 
             // Box_StayTopMost
             // 
+            this.Box_StayTopMost.AccessibleDescription = "Makes this client stay on top of other windows.";
+            this.Box_StayTopMost.AccessibleName = "Stay On Top";
             this.Box_StayTopMost.AutoSize = true;
             this.Box_StayTopMost.Checked = true;
             this.Box_StayTopMost.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -98,6 +113,7 @@
             this.Box_StayTopMost.Size = new System.Drawing.Size(86, 17);
             this.Box_StayTopMost.TabIndex = 3;
             this.Box_StayTopMost.Text = "Stay On Top";
+            this.Tooltip_Main.SetToolTip(this.Box_StayTopMost, "Makes this client stay on top of other windows.");
             this.Box_StayTopMost.UseVisualStyleBackColor = true;
             this.Box_StayTopMost.CheckedChanged += new System.EventHandler(this.Box_StayTopMost_CheckedChanged);
             // 
@@ -111,9 +127,12 @@
             this.Label_EsoIsRunning.TabIndex = 4;
             this.Label_EsoIsRunning.Text = "Evaluating if ESO is running...";
             this.Label_EsoIsRunning.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.Tooltip_Main.SetToolTip(this.Label_EsoIsRunning, "The current status of your Presence.");
             // 
             // Box_ToTray
             // 
+            this.Box_ToTray.AccessibleDescription = "Minimizes this client to the tray.";
+            this.Box_ToTray.AccessibleName = "Minimize to tray";
             this.Box_ToTray.AutoSize = true;
             this.Box_ToTray.Checked = true;
             this.Box_ToTray.CheckState = System.Windows.Forms.CheckState.Checked;
@@ -121,7 +140,8 @@
             this.Box_ToTray.Name = "Box_ToTray";
             this.Box_ToTray.Size = new System.Drawing.Size(98, 17);
             this.Box_ToTray.TabIndex = 5;
-            this.Box_ToTray.Text = "Minimise to tray";
+            this.Box_ToTray.Text = "Minimize to tray";
+            this.Tooltip_Main.SetToolTip(this.Box_ToTray, "Minimizes this client to the tray.");
             this.Box_ToTray.UseVisualStyleBackColor = true;
             this.Box_ToTray.CheckedChanged += new System.EventHandler(this.Box_ToTray_CheckedChanged);
             // 
@@ -135,18 +155,6 @@
             this.TrayIcon.Text = "Discord Status Updater";
             this.TrayIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseClick);
             this.TrayIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.TrayIcon_MouseDoubleClick);
-            // 
-            // Box_AutoStart
-            // 
-            this.Box_AutoStart.AutoSize = true;
-            this.Box_AutoStart.Location = new System.Drawing.Point(240, 75);
-            this.Box_AutoStart.Name = "Box_AutoStart";
-            this.Box_AutoStart.Size = new System.Drawing.Size(98, 17);
-            this.Box_AutoStart.TabIndex = 6;
-            this.Box_AutoStart.Text = "Auto Start ESO";
-            this.Box_AutoStart.UseVisualStyleBackColor = true;
-            this.Box_AutoStart.CheckedChanged += new System.EventHandler(this.Box_AutoStart_CheckedChanged);
-            this.Box_AutoStart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Box_AutoStart_MouseClick);
             // 
             // TrayContextMenu
             // 
@@ -170,12 +178,42 @@
             this.quitToolStripMenuItem.Text = "Quit";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.QuitToolStripMenuItem_Click);
             // 
+            // Box_AutoStart
+            // 
+            this.Box_AutoStart.AccessibleDescription = "Whether ESO should automatically be started with this client.";
+            this.Box_AutoStart.AccessibleName = "Auto Start ESO";
+            this.Box_AutoStart.AutoSize = true;
+            this.Box_AutoStart.Location = new System.Drawing.Point(240, 75);
+            this.Box_AutoStart.Name = "Box_AutoStart";
+            this.Box_AutoStart.Size = new System.Drawing.Size(98, 17);
+            this.Box_AutoStart.TabIndex = 6;
+            this.Box_AutoStart.Text = "Auto Start ESO";
+            this.Tooltip_Main.SetToolTip(this.Box_AutoStart, "Whether ESO should automatically be started with this client.\r\nRight click this t" +
+        "o enter a custom Steam ID for a Steam shortcut you\'ve created.");
+            this.Box_AutoStart.UseVisualStyleBackColor = true;
+            this.Box_AutoStart.CheckedChanged += new System.EventHandler(this.Box_AutoStart_CheckedChanged);
+            this.Box_AutoStart.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Box_AutoStart_MouseClick);
+            // 
+            // Box_AutoClose
+            // 
+            this.Box_AutoClose.AccessibleDescription = "Automatically closes this client when you exit ESO.";
+            this.Box_AutoClose.AccessibleName = "Auto Exit";
+            this.Box_AutoClose.AutoSize = true;
+            this.Box_AutoClose.Location = new System.Drawing.Point(240, 144);
+            this.Box_AutoClose.Name = "Box_AutoClose";
+            this.Box_AutoClose.Size = new System.Drawing.Size(68, 17);
+            this.Box_AutoClose.TabIndex = 7;
+            this.Box_AutoClose.Text = "Auto Exit";
+            this.Tooltip_Main.SetToolTip(this.Box_AutoClose, "Automatically closes this client when you exit ESO.");
+            this.Box_AutoClose.UseVisualStyleBackColor = true;
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(62)))));
-            this.ClientSize = new System.Drawing.Size(354, 161);
+            this.ClientSize = new System.Drawing.Size(354, 180);
+            this.Controls.Add(this.Box_AutoClose);
             this.Controls.Add(this.Box_AutoStart);
             this.Controls.Add(this.Box_ToTray);
             this.Controls.Add(this.Label_EsoIsRunning);
@@ -189,7 +227,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Main";
-            this.Text = "ESO Discord Rich Presence Client";
+            this.Text = "Discord Rich Presence for ESO";
             this.TopMost = true;
             this.Load += new System.EventHandler(this.Main_Load);
             this.Resize += new System.EventHandler(this.Main_Resize);
@@ -213,6 +251,8 @@
         private System.Windows.Forms.ContextMenuStrip TrayContextMenu;
         private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
+        private System.Windows.Forms.CheckBox Box_AutoClose;
+        private System.Windows.Forms.ToolTip Tooltip_Main;
     }
 }
 

@@ -59,8 +59,6 @@ namespace ESO_Discord_RichPresence_Client
 
         private void Main_Load(object sender, EventArgs e)
         {
-            this.Text = "ESO Discord Status";
-
             this.Settings = new Settings();
 
             this.HandleDuplicateClient();

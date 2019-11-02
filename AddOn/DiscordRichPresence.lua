@@ -18,7 +18,7 @@ DRP.savedVars.version = 1
 DRP.savedVars.ZO = nil
 DRP.savedVars.defaults = {
     ["settings"] = {
-        ["prioritySave"] = false,
+        ["prioritySave"] = true,
         ["autoReload"] = false
     },
     ["reloaded"] = true,

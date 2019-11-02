@@ -27,9 +27,10 @@ namespace ESO_Discord_RichPresence_Client
         private Discord DiscordClient;
         private SteamAppIdForm SteamAppIdForm;
 
+        public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
         public bool EsoIsRunning { get; set; } = false;
         public bool EsoRanOnce { get; set; } = false;
-        public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+        public bool JustMinimized { get; set; } = false;
 
         public Main()
         {
@@ -185,13 +186,12 @@ namespace ESO_Discord_RichPresence_Client
 
         private void InitEsoTimer()
         {
-            this.EsoTimer = new Timer();
-            this.EsoTimer.Tick += new EventHandler(UpdateEsoText);
-            this.EsoTimer.Interval = 1000;
+            this.EsoTimer = new Timer() { Interval = 1000 };
+            this.EsoTimer.Tick += new EventHandler(this.UpdateClientStatus);
             this.EsoTimer.Start();
         }
 
-        private void UpdateEsoText(object sender, EventArgs e)
+        private void UpdateClientStatus(object sender, EventArgs e)
         {
             if (!SavedVariables.Exists)
             {
@@ -221,6 +221,12 @@ namespace ESO_Discord_RichPresence_Client
                 if (!this.EsoRanOnce)
                     this.EsoRanOnce = true;
 
+                if (!this.JustMinimized)
+                {
+                    this.JustMinimized = true;
+                    this.Minimize();
+                }
+
                 this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
             }
 
@@ -228,6 +234,8 @@ namespace ESO_Discord_RichPresence_Client
             {
                 if ((bool)this.Settings.Get("AutoExit") && this.EsoRanOnce)
                     Application.Exit();
+
+                this.JustMinimized = false;
 
                 this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
             }
@@ -304,10 +312,18 @@ namespace ESO_Discord_RichPresence_Client
         private void Main_Resize(object sender, EventArgs e)
         {
             if (this.WindowState == FormWindowState.Minimized && (bool)this.Settings.Get("ToTray"))
-                this.MinimiseToTray();
+                this.MinimizeToTray();
         }
 
-        private void MinimiseToTray()
+        private void Minimize()
+        {
+            if ((bool)this.Settings.Get("ToTray"))
+                this.MinimizeToTray();
+            else
+                this.WindowState = FormWindowState.Minimized;
+        }
+
+        private void MinimizeToTray()
         {
             this.TrayIcon.Visible = true;
             this.Hide();

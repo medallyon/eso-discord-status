@@ -182,8 +182,9 @@ namespace ESO_Discord_RichPresence_Client
             {
                 this.EsoIsRunning = true;
                 this.DiscordClient.Enable();
-                this.DiscordClient.UpdatePresence();
+
                 this.StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                this.DiscordClient.UpdatePresence();
             }
 
             else if ((processes.Length == 0 && this.EsoIsRunning) || processes.Length == 0)

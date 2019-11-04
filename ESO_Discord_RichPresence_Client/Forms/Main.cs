@@ -48,8 +48,15 @@ namespace ESO_Discord_RichPresence_Client
 
         private void HandleDuplicateClient()
         {
-            Process[] pName = Process.GetProcessesByName("ESO_Discord_RichPresence_Client");
-            if (pName.Length == 1)
+            Process[] defaultProcesses = Process.GetProcessesByName("ESO_Discord_RichPresence_Client")
+                , customProcesses = Process.GetProcessesByName("DiscordStatusClient");
+
+            // Concat arrays
+            Process[] runningProcesses = new Process[defaultProcesses.Length + customProcesses.Length];
+            defaultProcesses.CopyTo(runningProcesses, 0);
+            customProcesses.CopyTo(runningProcesses, defaultProcesses.Length);
+
+            if (runningProcesses.Length == 1)
                 return;
 
             if ((bool)this.Settings.Get("AutoStart"))

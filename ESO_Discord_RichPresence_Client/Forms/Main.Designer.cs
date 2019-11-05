@@ -40,10 +40,11 @@
             this.TrayIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.TrayContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.startEsoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Box_AutoStart = new System.Windows.Forms.CheckBox();
             this.Box_AutoExit = new System.Windows.Forms.CheckBox();
             this.Tooltip_Main = new System.Windows.Forms.ToolTip(this.components);
+            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -160,23 +161,24 @@
             // 
             this.TrayContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showToolStripMenuItem,
+            this.startEsoToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.TrayContextMenu.Name = "TrayContextMenu";
-            this.TrayContextMenu.Size = new System.Drawing.Size(104, 48);
+            this.TrayContextMenu.Size = new System.Drawing.Size(181, 92);
             // 
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.showToolStripMenuItem.Text = "Show";
             this.showToolStripMenuItem.Click += new System.EventHandler(this.ShowToolStripMenuItem_Click);
             // 
-            // quitToolStripMenuItem
+            // startEsoToolStripMenuItem
             // 
-            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
-            this.quitToolStripMenuItem.Text = "Quit";
-            this.quitToolStripMenuItem.Click += new System.EventHandler(this.QuitToolStripMenuItem_Click);
+            this.startEsoToolStripMenuItem.Name = "startEsoToolStripMenuItem";
+            this.startEsoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.startEsoToolStripMenuItem.Text = "Launch ESO";
+            this.startEsoToolStripMenuItem.Click += new System.EventHandler(this.startEsoToolStripMenuItem_Click);
             // 
             // Box_AutoStart
             // 
@@ -207,6 +209,13 @@
             this.Tooltip_Main.SetToolTip(this.Box_AutoExit, "Automatically closes this client when you exit ESO.");
             this.Box_AutoExit.UseVisualStyleBackColor = true;
             this.Box_AutoExit.CheckedChanged += new System.EventHandler(this.Box_AutoExit_CheckedChanged);
+            // 
+            // quitToolStripMenuItem
+            // 
+            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.Click += new System.EventHandler(this.QuitToolStripMenuItem_Click);
             // 
             // Main
             // 
@@ -251,9 +260,10 @@
         private System.Windows.Forms.CheckBox Box_AutoStart;
         private System.Windows.Forms.ContextMenuStrip TrayContextMenu;
         private System.Windows.Forms.ToolStripMenuItem showToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem startEsoToolStripMenuItem;
         private System.Windows.Forms.CheckBox Box_AutoExit;
         private System.Windows.Forms.ToolTip Tooltip_Main;
+        private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
     }
 }
 

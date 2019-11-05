@@ -246,6 +246,8 @@ namespace ESO_Discord_RichPresence_Client
 
                 this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
             }
+
+            this.TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = !EsoIsRunning;
         }
 
         public void UpdateStatusField(string status)
@@ -419,6 +421,11 @@ namespace ESO_Discord_RichPresence_Client
         private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
+        }
+
+        private void startEsoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.StartESO();
         }
     }
 }

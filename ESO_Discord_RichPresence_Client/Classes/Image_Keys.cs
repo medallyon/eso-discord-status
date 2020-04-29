@@ -49,6 +49,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Summerset",
                     "The Rift",
                     "Vvardenfell",
+                    "Western Skyrim",
                     "Wrothgar"
                 }
             },
@@ -78,6 +79,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Frostvault",
                     "Fungal Grotto I",
                     "Fungal Grotto II",
+                    "Icereach",
                     "Imperial City Prison",
                     "Lair of Maarselok",
                     "Maelstrom Arena",
@@ -92,6 +94,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Tempest Island",
                     "The Banished Cells I",
                     "The Banished Cells II",
+                    "Unhallowed Grave",
                     "Vaults of Madness",
                     "Wayrest Sewers I",
                     "Wayrest Sewers II",

@@ -106,6 +106,11 @@ namespace ESO_Discord_RichPresence_Client
             this.PresenceData.state = character.QuestName;
 
             this.PresenceData.largeImageKey = Image_Keys.Locations.Get(character.Zone);
+
+            // Try to get image for parent zone if not found; will probably still return default
+            if (this.PresenceData.largeImageKey == "default")
+                this.PresenceData.largeImageKey = Image_Keys.Locations.Get(character.ParentZone);
+
             this.PresenceData.largeImageText = (character.SubZone != null && character.SubZone.Length > 0) ? character.SubZone : character.Zone;
             this.PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
             this.PresenceData.smallImageText = character.Class;

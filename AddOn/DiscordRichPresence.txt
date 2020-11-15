@@ -1,4 +1,4 @@
-## APIVersion: 100032
+## APIVersion: 100033
 ## Title: |c7289DADiscord|r Rich Presence
 ## Author: |cDAA520@Medallyon|cABABAB#5012|r
 ## Description: This Addon attempts to sync your in-game activity with your Discord Status. It takes a while to automatically update, depending on what settings you choose. Type |c358CD4/DRP|r to edit these settings.

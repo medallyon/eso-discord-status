@@ -1,6 +1,6 @@
 # Discord Status Updater for ESO (using Rich Presence)
 
-*Updated to Update 27, or ESOUI version 100032*.
+*Updated to Update 28, or ESOUI version 100033*.
 
 This little program is made using the .Net 4.6.1 framework and sends Rich Presence data to your local Discord client, making your status say more than just "Playing **Elder Scrolls Online**", including info about your current location, your level, your current party, and more! While running, your presence should look like this:
 

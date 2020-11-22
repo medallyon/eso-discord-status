@@ -133,6 +133,8 @@ namespace ESO_Discord_RichPresence_Client
 
         private static string GetKey(string category, string locationName)
         {
+            locationName = TreatLocationName(locationName);
+
             if (!Lookup(category, locationName))
                 return "default";
 
@@ -140,6 +142,14 @@ namespace ESO_Discord_RichPresence_Client
                 .Replace(' ', '_')
                 .Replace('-', '_')
                 .Replace("\'", String.Empty);
+        }
+
+        private static string TreatLocationName(string locationName)
+        {
+            if (locationName.ToLower().Contains("blackreach:"))
+                return "Blackreach";
+
+            return locationName;
         }
         #endregion
 

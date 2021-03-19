@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using NLua;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NLua;
 
 namespace ESO_Discord_RichPresence_Client
 {

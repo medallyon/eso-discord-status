@@ -38,6 +38,7 @@
             this.SteamIdTextBox.Name = "SteamIdTextBox";
             this.SteamIdTextBox.Size = new System.Drawing.Size(130, 20);
             this.SteamIdTextBox.TabIndex = 0;
+            this.SteamIdTextBox.TextChanged += new System.EventHandler(this.SteamIdTextBox_TextChanged);
             // 
             // SteamAppIdForm
             // 

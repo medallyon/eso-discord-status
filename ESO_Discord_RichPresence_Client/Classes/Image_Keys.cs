@@ -58,6 +58,7 @@ namespace ESO_Discord_RichPresence_Client
                 new string[]
                 {
                     "Arx Corinium",
+                    "Black Drake Villa",
                     "Blackheart Haven",
                     "Blackrose Prison",
                     "Blessed Crucible",
@@ -96,6 +97,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Tempest Island",
                     "The Banished Cells I",
                     "The Banished Cells II",
+                    "The Cauldron",
                     "Unhallowed Grave",
                     "Vaults of Madness",
                     "Wayrest Sewers I",

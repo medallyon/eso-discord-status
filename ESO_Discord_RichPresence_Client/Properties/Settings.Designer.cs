@@ -154,5 +154,17 @@ namespace ESO_Discord_RichPresence_Client.Properties {
                 this["AutoExit"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool CloseLauncher {
+            get {
+                return ((bool)(this["CloseLauncher"]));
+            }
+            set {
+                this["CloseLauncher"] = value;
+            }
+        }
     }
 }

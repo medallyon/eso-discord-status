@@ -104,6 +104,7 @@ namespace ESO_Discord_RichPresence_Client
             this.Box_StayTopMost.Checked = (bool)this.Settings.Get("StayTopMost");
             this.Box_AutoStart.Checked = (bool)this.Settings.Get("AutoStart");
             this.Box_AutoExit.Checked = (bool)this.Settings.Get("AutoExit");
+            this.Box_CloseLauncher.Checked = (bool)this.Settings.Get("CloseLauncher");
 
             if (this.Settings.Get("CustomSteamAppID") != null)
                 this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)this.Settings.Get("CustomSteamAppID");
@@ -200,7 +201,6 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             Process[] processes = Process.GetProcessesByName("eso64");
-
             if (processes.Length > 0 && !this.EsoIsRunning)
             {
                 this.EsoIsRunning = true;
@@ -218,8 +218,11 @@ namespace ESO_Discord_RichPresence_Client
 
             if (this.EsoIsRunning)
             {
-                if (!this.EsoRanOnce)
-                    this.EsoRanOnce = true;
+                this.EsoRanOnce = true;
+
+                processes = Process.GetProcessesByName("Bethesda.net_Launcher");
+                if (processes.Length > 0)
+                    processes[0].Kill();
 
                 if (!this.JustMinimized)
                 {
@@ -347,6 +350,11 @@ namespace ESO_Discord_RichPresence_Client
         private void Box_AutoStart_CheckedChanged(object sender, EventArgs e)
         {
             this.Settings.Set("AutoStart", this.Box_AutoStart.Checked);
+        }
+
+        private void Box_CloseLauncher_CheckedChanged(object sender, EventArgs e)
+        {
+            this.Settings.Set("CloseLauncher", this.Box_CloseLauncher.Checked);
         }
 
         private void Box_AutoExit_CheckedChanged(object sender, EventArgs e)

@@ -18,6 +18,7 @@ namespace ESO_Discord_RichPresence_Client
             { "StayTopMost", true },
             { "AutoStart", false },
             { "AutoExit", false },
+            { "CloseLauncher", false },
             { "MinimizedOnce", false }
         };
 

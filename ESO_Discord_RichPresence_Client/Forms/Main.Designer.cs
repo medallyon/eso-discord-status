@@ -41,10 +41,11 @@
             this.TrayContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.startEsoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Box_AutoStart = new System.Windows.Forms.CheckBox();
             this.Box_AutoExit = new System.Windows.Forms.CheckBox();
             this.Tooltip_Main = new System.Windows.Forms.ToolTip(this.components);
-            this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.Box_CloseLauncher = new System.Windows.Forms.CheckBox();
             this.TrayContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -109,7 +110,7 @@
             this.Box_StayTopMost.AutoSize = true;
             this.Box_StayTopMost.Checked = true;
             this.Box_StayTopMost.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.Box_StayTopMost.Location = new System.Drawing.Point(240, 121);
+            this.Box_StayTopMost.Location = new System.Drawing.Point(206, 75);
             this.Box_StayTopMost.Name = "Box_StayTopMost";
             this.Box_StayTopMost.Size = new System.Drawing.Size(86, 17);
             this.Box_StayTopMost.TabIndex = 3;
@@ -137,7 +138,7 @@
             this.Box_ToTray.AutoSize = true;
             this.Box_ToTray.Checked = true;
             this.Box_ToTray.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.Box_ToTray.Location = new System.Drawing.Point(240, 98);
+            this.Box_ToTray.Location = new System.Drawing.Point(25, 144);
             this.Box_ToTray.Name = "Box_ToTray";
             this.Box_ToTray.Size = new System.Drawing.Size(98, 17);
             this.Box_ToTray.TabIndex = 5;
@@ -164,28 +165,37 @@
             this.startEsoToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.TrayContextMenu.Name = "TrayContextMenu";
-            this.TrayContextMenu.Size = new System.Drawing.Size(181, 92);
+            this.TrayContextMenu.Size = new System.Drawing.Size(138, 70);
             // 
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.showToolStripMenuItem.Text = "Show";
             this.showToolStripMenuItem.Click += new System.EventHandler(this.ShowToolStripMenuItem_Click);
             // 
             // startEsoToolStripMenuItem
             // 
             this.startEsoToolStripMenuItem.Name = "startEsoToolStripMenuItem";
-            this.startEsoToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.startEsoToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.startEsoToolStripMenuItem.Text = "Launch ESO";
             this.startEsoToolStripMenuItem.Click += new System.EventHandler(this.startEsoToolStripMenuItem_Click);
+            // 
+            // quitToolStripMenuItem
+            // 
+            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
+            this.quitToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
+            this.quitToolStripMenuItem.Text = "Quit";
+            this.quitToolStripMenuItem.Click += new System.EventHandler(this.QuitToolStripMenuItem_Click);
             // 
             // Box_AutoStart
             // 
             this.Box_AutoStart.AccessibleDescription = "Whether ESO should automatically be started with this client.";
             this.Box_AutoStart.AccessibleName = "Auto Start ESO";
             this.Box_AutoStart.AutoSize = true;
-            this.Box_AutoStart.Location = new System.Drawing.Point(240, 75);
+            this.Box_AutoStart.Checked = true;
+            this.Box_AutoStart.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.Box_AutoStart.Location = new System.Drawing.Point(206, 98);
             this.Box_AutoStart.Name = "Box_AutoStart";
             this.Box_AutoStart.Size = new System.Drawing.Size(98, 17);
             this.Box_AutoStart.TabIndex = 6;
@@ -201,7 +211,9 @@
             this.Box_AutoExit.AccessibleDescription = "Automatically closes this client when you exit ESO.";
             this.Box_AutoExit.AccessibleName = "Auto Exit";
             this.Box_AutoExit.AutoSize = true;
-            this.Box_AutoExit.Location = new System.Drawing.Point(240, 144);
+            this.Box_AutoExit.Checked = true;
+            this.Box_AutoExit.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.Box_AutoExit.Location = new System.Drawing.Point(206, 144);
             this.Box_AutoExit.Name = "Box_AutoExit";
             this.Box_AutoExit.Size = new System.Drawing.Size(68, 17);
             this.Box_AutoExit.TabIndex = 7;
@@ -210,12 +222,21 @@
             this.Box_AutoExit.UseVisualStyleBackColor = true;
             this.Box_AutoExit.CheckedChanged += new System.EventHandler(this.Box_AutoExit_CheckedChanged);
             // 
-            // quitToolStripMenuItem
+            // Box_CloseLauncher
             // 
-            this.quitToolStripMenuItem.Name = "quitToolStripMenuItem";
-            this.quitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.quitToolStripMenuItem.Text = "Quit";
-            this.quitToolStripMenuItem.Click += new System.EventHandler(this.QuitToolStripMenuItem_Click);
+            this.Box_CloseLauncher.AccessibleDescription = "Automatically exits the launcher after the game has been launched.";
+            this.Box_CloseLauncher.AccessibleName = "Auto Close Launcher";
+            this.Box_CloseLauncher.AutoSize = true;
+            this.Box_CloseLauncher.Checked = true;
+            this.Box_CloseLauncher.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.Box_CloseLauncher.Location = new System.Drawing.Point(206, 121);
+            this.Box_CloseLauncher.Name = "Box_CloseLauncher";
+            this.Box_CloseLauncher.Size = new System.Drawing.Size(125, 17);
+            this.Box_CloseLauncher.TabIndex = 8;
+            this.Box_CloseLauncher.Text = "Auto Close Launcher";
+            this.Tooltip_Main.SetToolTip(this.Box_CloseLauncher, "Automatically exits the launcher after the game has been launched.");
+            this.Box_CloseLauncher.UseVisualStyleBackColor = true;
+            this.Box_CloseLauncher.CheckedChanged += new System.EventHandler(this.Box_CloseLauncher_CheckedChanged);
             // 
             // Main
             // 
@@ -223,6 +244,7 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(62)))));
             this.ClientSize = new System.Drawing.Size(354, 180);
+            this.Controls.Add(this.Box_CloseLauncher);
             this.Controls.Add(this.Box_AutoExit);
             this.Controls.Add(this.Box_AutoStart);
             this.Controls.Add(this.Box_ToTray);
@@ -264,6 +286,7 @@
         private System.Windows.Forms.CheckBox Box_AutoExit;
         private System.Windows.Forms.ToolTip Tooltip_Main;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
+        private System.Windows.Forms.CheckBox Box_CloseLauncher;
     }
 }
 

@@ -220,9 +220,12 @@ namespace ESO_Discord_RichPresence_Client
             {
                 this.EsoRanOnce = true;
 
-                processes = Process.GetProcessesByName("Bethesda.net_Launcher");
-                if (processes.Length > 0)
-                    processes[0].Kill();
+                if ((bool)this.Settings.Get("CloseLauncher"))
+                {
+                    processes = Process.GetProcessesByName("Bethesda.net_Launcher");
+                    if (processes.Length > 0)
+                        processes[0].Kill();
+                }
 
                 if (!this.JustMinimized)
                 {

@@ -101,21 +101,21 @@ namespace ESO_Discord_RichPresence_Client
             this.Account = (string)character["account"];
             this.Race = (string)character["race"];
             this.Class = (string)character["class"];
-            this.genderInt = (int)(double)character["gender"];
-            this.allianceInt = (int)(double)character["alliance"];
+            this.genderInt = (int)(long)character["gender"];
+            this.allianceInt = (int)(long)character["alliance"];
             this.ParentZone = (string)character["parentZone"];
             this.Zone = (string)character["zone"];
             this.SubZone = (string)character["subZone"];
             this.IsChampion = (bool)character["isChampion"];
-            this.Level = (int)(double)character["level"];
+            this.Level = (int)(long)character["level"];
 
             this.IsGrouped = (bool)character["isGrouped"];
-            this.GroupSize = (int)(double)character["groupSize"];
-            this.groupRoleInt = (int)(double)character["groupRole"];
+            this.GroupSize = (int)(long)character["groupSize"];
+            this.groupRoleInt = (int)(long)character["groupRole"];
             this.InDungeon = (bool)character["inDungeon"];
-            this.dungeonDifficultyInt = (int)(double)character["isDungeonVeteran"];
+            this.dungeonDifficultyInt = (int)(long)character["isDungeonVeteran"];
 
-            this.Battlegrounds_GameType = (int)(double)character["bg_GameType"];
+            this.Battlegrounds_GameType = (int)(long)character["bg_GameType"];
             this.Battlegrounds_Name = (string)character["bg_Name"];
             this.Battlegrounds_Description = (string)character["bg_Description"];
 

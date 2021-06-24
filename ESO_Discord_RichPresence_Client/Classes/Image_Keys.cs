@@ -20,6 +20,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Bangkorai",
                     "Betnikh",
                     "Blackreach",
+                    "Blackwood",
                     "Bleakrock Isle",
                     "Clockwork City",
                     "Coldharbour",
@@ -115,6 +116,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Halls of Fabrication",
                     "Hel Ra Citadel",
                     "Maw of Lorkhaj",
+                    "Rockgrove",
                     "Sanctum Ophidia",
                     "Sunspire"
                 }

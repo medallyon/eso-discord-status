@@ -198,7 +198,7 @@ public class DiscordRpc
                 return str;
             }
 
-            var newstrbytes = new byte[] { };
+            var newstrbytes = new byte[maxbytes];
             Array.Copy(strbytes, 0, newstrbytes, 0, maxbytes - 1);
             newstrbytes[newstrbytes.Length - 1] = 0;
             newstrbytes[newstrbytes.Length - 2] = 0;

@@ -7,6 +7,8 @@ using System.Security.Permissions;
 using System.Threading;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Text;
+using NLua.Exceptions;
 
 namespace ESO_Discord_RichPresence_Client
 {
@@ -59,35 +61,38 @@ namespace ESO_Discord_RichPresence_Client
 
         static public EsoCharacter ParseLua(string luaTable)
         {
-            var LuaClient = new Lua();
-            object[] result = null;
-
-            try
+            using (var LuaClient = new Lua())
             {
-                result = LuaClient.DoString(luaTable);
+                LuaClient.State.Encoding = Encoding.UTF8;
+                object[] result = null;
+
+                try
+                {
+                    result = LuaClient.DoString(luaTable);
+                }
+
+                catch (LuaException error)
+                {
+                    var luaErrorResponse = MessageBox.Show($"Something went wrong while reading data from ESO: {error.Message}", "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+
+                    if (luaErrorResponse == DialogResult.Retry)
+                        ParseLua(luaTable);
+                    else if (luaErrorResponse == DialogResult.Abort)
+                        Application.Exit();
+                }
+
+                LuaTable rootTable = LuaClient.GetTable($"{Main.ADDON_NAME}_SavedVars");
+                LuaTable defaultTable = (LuaTable)rootTable["Default"];
+
+                Dictionary<object, LuaTable> Accounts = new Dictionary<object, LuaTable>();
+                foreach (object key in defaultTable.Keys)
+                {
+                    LuaTable value = (LuaTable)defaultTable[key];
+                    Accounts.Add(key, value);
+                }
+
+                return new EsoCharacter((LuaTable)Accounts.Values.First()["$AccountWide"]);
             }
-
-            catch (NLua.Exceptions.LuaException error)
-            {
-                var luaErrorResponse = MessageBox.Show($"Something went wrong while reading data from ESO: {error.Message}", "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
-
-                if (luaErrorResponse == DialogResult.Retry)
-                    ParseLua(luaTable);
-                else if (luaErrorResponse == DialogResult.Abort)
-                    Application.Exit();
-            }
-
-            LuaTable rootTable = LuaClient.GetTable($"{Main.ADDON_NAME}_SavedVars");
-            LuaTable defaultTable = (LuaTable)rootTable["Default"];
-
-            Dictionary<object, LuaTable> Accounts = new Dictionary<object, LuaTable>();
-            foreach (object key in defaultTable.Keys)
-            {
-                LuaTable value = (LuaTable)defaultTable[key];
-                Accounts.Add(key, value);
-            }
-
-            return new EsoCharacter((LuaTable)Accounts.Values.First()["$AccountWide"]);
         }
 
         public void EnsureSavedVarsExist()

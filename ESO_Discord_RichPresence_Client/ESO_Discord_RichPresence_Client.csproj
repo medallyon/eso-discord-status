@@ -114,6 +114,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
+      xcopy /s /y "..\..\..\packages\NLua.1.5.7\lib\net46\*.*" "$(TargetDir)"
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

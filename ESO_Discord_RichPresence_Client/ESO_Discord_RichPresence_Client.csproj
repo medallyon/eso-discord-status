@@ -148,6 +148,7 @@
   <PropertyGroup>
     <PostBuildEvent>
       xcopy /s /y "..\..\..\packages\NLua.1.5.9\lib\net46\*.*" "$(TargetDir)"
+      xcopy /s /y "..\..\..\packages\win32-dynamic\*.*" "$(TargetDir)win32-dynamic\"
     </PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>

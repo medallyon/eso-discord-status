@@ -259,3 +259,7 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
+
+# except discord-rpc
+!**/packages/win32-dynamic/
+!**/packages/win32-dynamic/**

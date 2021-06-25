@@ -60,4 +60,5 @@ This program currently only supports Windows. Visit the [Releases](https://githu
 ## Credits
 
 + [Medallyon](https://github.com/medallyon) - Main codebase & maintenance
-+ [Whisperity](https://github.com/whisperity) - Some additional low-level stuff
++ [Whisperity](https://github.com/whisperity) - Addon Packaging & Unpackaging
++ [@Friday-The13-rus](https://github.com/friday-the13-rus) - Support for non-English ESO localizations

@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
-using Microsoft.Win32;
 
 namespace ESO_Discord_RichPresence_Client
 {
@@ -16,6 +16,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public Settings Settings;
         private Timer EsoTimer;
+        private Timer CloseTimer;
         private SavedVariables SavedVars;
         private Discord DiscordClient;
         private SteamAppIdForm SteamAppIdForm;
@@ -72,7 +73,7 @@ namespace ESO_Discord_RichPresence_Client
             this.InitialiseSettings();
             this.SavedVars.Initialise();
 
-            this.InitEsoTimer();
+            this.InitEsoTimers();
         }
 
         private void CreateSteamAppIdForm()
@@ -185,11 +186,14 @@ namespace ESO_Discord_RichPresence_Client
             });
         }
 
-        private void InitEsoTimer()
+        private void InitEsoTimers()
         {
-            this.EsoTimer = new Timer() { Interval = 1000 };
-            this.EsoTimer.Tick += new EventHandler(this.UpdateClientStatus);
-            this.EsoTimer.Start();
+            EsoTimer = new Timer { Interval = 1000 };
+            EsoTimer.Tick += UpdateClientStatus;
+            EsoTimer.Start();
+
+            CloseTimer = new Timer { Interval = 1000 };
+            CloseTimer.Tick += CloseTimer_Tick;
         }
 
         private void UpdateClientStatus(object sender, EventArgs e)
@@ -222,9 +226,8 @@ namespace ESO_Discord_RichPresence_Client
 
                 if ((bool)this.Settings.Get("CloseLauncher"))
                 {
-                    processes = Process.GetProcessesByName("Bethesda.net_Launcher");
-                    if (processes.Length > 0)
-                        processes[0].Kill();
+                    // Close the launcher after 1s
+                    CloseTimer.Start();
                 }
 
                 if (!this.JustMinimized)
@@ -249,11 +252,18 @@ namespace ESO_Discord_RichPresence_Client
             this.TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = !EsoIsRunning;
         }
 
+        private void CloseTimer_Tick(object sender, EventArgs e)
+        {
+            CloseTimer.Stop();
+            Process[] processes = Process.GetProcessesByName("Bethesda.net_Launcher");
+            if (processes.Length > 0)
+                processes[0].Kill();
+        }
+
         public void UpdateStatusField(string status)
         {
             this.UpdateStatusField(status, Color.DarkGray);
         }
-
         public void UpdateStatusField(string status, Color newColor, FontStyle style = FontStyle.Regular)
         {
             if (this.Label_EsoIsRunning.InvokeRequired)

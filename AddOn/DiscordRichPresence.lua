@@ -2,17 +2,17 @@ DRP = {}
 DRP.handlers = {}
 DRP.commands = {}
 
-DRP.name = "DiscordRichPresence"
+DRP.name = "DiscordStatus"
 
 DRP.meta = {
-    name = "Discord Rich Presence",
+    name = "Discord Status",
     author = "@Medallyon#5012",
-    version = "0.4.3",
+    version = "0.4.4",
     website = "https://www.esoui.com/downloads/info2054-DiscordStatusUpdater.html"
 }
 
 DRP.savedVars = {}
-DRP.savedVars.name = "DiscordRichPresence_SavedVars"
+DRP.savedVars.name = "DiscordStatus_SavedVars"
 DRP.savedVars.version = 1
 
 DRP.savedVars.ZO = nil
@@ -93,7 +93,7 @@ function DRP:CreateAddonMenu()
     DRP.LAM:RegisterOptionControls(DRP.name .. "_Settings", {
         [1] = {
             type = "description",
-            text = "This Addon attempts to set your Rich Presence on Discord based on your current location or activity in-game.\n\nIf you're using the |c00b3b3Priority Save|r option, it is unknown how fast your status will update. It seems to be random how long it takes for your status to be updated using this method. But at least with this option, you are avoiding an additional loading screen.\n\nNOTE: Don't forget to start |cff0000DiscordStatusClient.exe|r found in the |cdaa520Client|r folder that comes with the Addon."
+            text = "This Addon attempts to set your Status on Discord based on your current location or activity in-game.\n\nIf you're using the |c00b3b3Priority Save|r option, it is unknown how fast your status will update. It seems to be random how long it takes for your status to be updated using this method. But at least with this option, you are avoiding an additional loading screen.\n\nNOTE: Don't forget to start |cff0000DiscordStatusClient.exe|r found in the |cdaa520Client|r folder that comes with the Addon."
         },
         [2] = {
             type = "checkbox",

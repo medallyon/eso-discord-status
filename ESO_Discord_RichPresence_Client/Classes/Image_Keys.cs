@@ -34,6 +34,7 @@ namespace ESO_Discord_RichPresence_Client
                     "Greenshade",
                     "Hew's Bane",
                     "Imperial City",
+                    "Imperial Sewers",
                     "Khenarthi's Roost",
                     "Malabal Tor",
                     "Murkmire",

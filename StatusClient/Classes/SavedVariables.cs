@@ -87,7 +87,7 @@ namespace ESO_Discord_RichPresence_Client
             // "Elder Scrolls Online" doesn't exist in "My Documents"
             if (!Directory.Exists(EsoDir))
             {
-                DialogResult response = MessageBox.Show("ESO Documents not found. Please select the \"Elder Scrolls Online\" folder in your Documents.", "File not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                DialogResult response = MessageBox.Show(@"Please select the ""Elder Scrolls Online"" folder in your Documents.", "File not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
 
                 if (response == DialogResult.OK)
                 {

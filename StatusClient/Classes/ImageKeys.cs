@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace ESO_Discord_RichPresence_Client
 {
-    public static class Image_Keys
+    public static class ImageKeys
     {
         #region Data
         private static Dictionary<string, string[]> ZoneMap = new Dictionary<string, string[]>(3)

@@ -74,11 +74,11 @@ namespace ESO_Discord_RichPresence_Client
 
             PresenceData.state = character.QuestName;
 
-            PresenceData.largeImageKey = Image_Keys.Locations.Get(character.Zone);
+            PresenceData.largeImageKey = ImageKeys.Locations.Get(character.Zone);
 
             // Try to get image for parent zone if not found; will probably still return default
             if (PresenceData.largeImageKey == "default")
-                PresenceData.largeImageKey = Image_Keys.Locations.Get(character.ParentZone);
+                PresenceData.largeImageKey = ImageKeys.Locations.Get(character.ParentZone);
 
             PresenceData.largeImageText = (character.SubZone != null && character.SubZone.Length > 0) ? character.SubZone : character.Zone;
             PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
@@ -90,7 +90,7 @@ namespace ESO_Discord_RichPresence_Client
             {
                 PresenceData.largeImageText = character.Dungeon;
 
-                if (Image_Keys.Trials.IsValid(character.Dungeon) || Image_Keys.Dungeons.IsValid(character.Dungeon))
+                if (ImageKeys.Trials.IsValid(character.Dungeon) || ImageKeys.Dungeons.IsValid(character.Dungeon))
                 {
                     PresenceData.state = (character.GroupRole != null) ? character.GroupRole : "";
 
@@ -103,7 +103,7 @@ namespace ESO_Discord_RichPresence_Client
                     )
                         PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
-                    PresenceData.largeImageKey = (Image_Keys.Trials.IsValid(character.Dungeon)) ? Image_Keys.Trials.Get(character.Dungeon) : Image_Keys.Dungeons.Get(character.Dungeon);
+                    PresenceData.largeImageKey = (ImageKeys.Trials.IsValid(character.Dungeon)) ? ImageKeys.Trials.Get(character.Dungeon) : ImageKeys.Dungeons.Get(character.Dungeon);
                     PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
                     PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
                 }

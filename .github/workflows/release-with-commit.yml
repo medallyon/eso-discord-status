@@ -3,7 +3,7 @@ name: Release with commit
 on:
   push:
     branches:
-      - stable
+      - master
 jobs:
   release:
     runs-on: ubuntu-latest

@@ -1,0 +1,28 @@
+12-01-2022: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.4.4
+
+24-06-2021: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.4.3
+
+22-04-2021: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.4.1
+
+19-03-2021: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.4.0
+
+22-11-2020: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.3.9
+
+15-11-2020: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.3.8
+
+10-09-2020: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.3.7
+
+05-11-2019: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.3.6
+
+02-11-2019: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.3.5
+
+30-10-2019: Fixes wrong images showing for dungeons and introduces a potential subzone as info (e.g. shows Anvil if you're in Anvil, Gold Coast).
+
+28-10-2019 (0.3.3) Added missing Group Arenas
+28-10-2019: More info & better formatting
+
+27-10-2019: Remove redundant logging (v0.3.1)
+27-10-2019: Update Addon and description.
+
+27-06-2018: Update page description to be fancier and more informative. EDIT: Update <code> to <quote>.
+27-06-2018: Change ZIP name so that files are exported into the correct AddOn folder ('DiscordRichPresence' instead of 'DiscordRichPresence-v0.1.3'). Also, rename the AddOn page to make it shorter.

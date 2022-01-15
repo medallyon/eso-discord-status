@@ -69,18 +69,14 @@ jobs:
       env:
         Configuration: ${{ matrix.configuration }}
       run: |
-        Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\Client\" -Recurse -Force
-        
-        $pkg = @{
-          Path = ".\AddOn\*", ".\Client\"
-          CompressionLevel = "Fastest"
-          DestinationPath = ".\DiscordStatus.zip"
-        }
-        Compress-Archive @pkg
+        Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.config", "*.pdb", "*.xml", "*.dylib", "*.so" -Recurse -Force
+      
+        Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\dist\Client\" -Recurse -Force
+        Copy-Item -Path ".\AddOn\*" -Destination ".\dist\" -Recurse -Force
 
     # Upload compressed package
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
         name: Discord Status
-        path: .\DiscordStatus.zip
+        path: .\dist\*

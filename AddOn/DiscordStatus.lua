@@ -1,22 +1,22 @@
-DRP = {}
-DRP.handlers = {}
-DRP.commands = {}
+DS = {}
+DS.handlers = {}
+DS.commands = {}
 
-DRP.name = "DiscordStatus"
+DS.name = "DiscordStatus"
 
-DRP.meta = {
+DS.meta = {
     name = "Discord Status",
     author = "@Medallyon#5012",
     version = "0.4.4",
     website = "https://www.esoui.com/downloads/info2054-DiscordStatusUpdater.html"
 }
 
-DRP.savedVars = {}
-DRP.savedVars.name = "DiscordStatus_SavedVars"
-DRP.savedVars.version = 1
+DS.savedVars = {}
+DS.savedVars.name = "DiscordStatus_SavedVars"
+DS.savedVars.version = 1
 
-DRP.savedVars.ZO = nil
-DRP.savedVars.defaults = {
+DS.savedVars.ZO = nil
+DS.savedVars.defaults = {
     ["settings"] = {
         ["prioritySave"] = true,
         ["autoReload"] = false
@@ -54,43 +54,43 @@ DRP.savedVars.defaults = {
 --                        FUNCTIONS                        --
 -------------------------------------------------------------
 
-function DRP:CreateNewSavedVars()
-    DRP.savedVars.ZO = ZO_SavedVars:NewAccountWide(DRP.savedVars.name, DRP.savedVars.version, nil, DRP.savedVars.defaults)
+function DS:CreateNewSavedVars()
+    DS.savedVars.ZO = ZO_SavedVars:NewAccountWide(DS.savedVars.name, DS.savedVars.version, nil, DS.savedVars.defaults)
 end
 
-function DRP:Initialize()
-    if DRP.savedVars.ZO == nil then DRP:CreateNewSavedVars() end
+function DS:Initialize()
+    if DS.savedVars.ZO == nil then DS:CreateNewSavedVars() end
 
-    DRP:CreateAddonMenu()
+    DS:CreateAddonMenu()
 
     -- Register Event for after a loading screen / zone change
-    EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_PLAYER_ACTIVATED, DRP.handlers.OnPlayerActivated)
+    EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_PLAYER_ACTIVATED, DS.handlers.OnPlayerActivated)
 
     -- Register Events for quest-related things
-    EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_QUEST_ADDED, DRP.handlers.SaveQuestHandler)
-    EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_QUEST_ADVANCED, DRP.handlers.SaveQuestHandler)
-    EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_QUEST_SHOW_JOURNAL_ENTRY, DRP.handlers.SaveQuestHandler)
-    EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_ACTIVE_QUEST_TOOL_CHANGED, DRP.handlers.SaveQuestHandler)
-    EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_ZONE_STORY_QUEST_ACTIVITY_TRACKED, DRP.handlers.SaveQuestHandler)
+    EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_QUEST_ADDED, DS.handlers.SaveQuestHandler)
+    EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_QUEST_ADVANCED, DS.handlers.SaveQuestHandler)
+    EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_QUEST_SHOW_JOURNAL_ENTRY, DS.handlers.SaveQuestHandler)
+    EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_ACTIVE_QUEST_TOOL_CHANGED, DS.handlers.SaveQuestHandler)
+    EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_ZONE_STORY_QUEST_ACTIVITY_TRACKED, DS.handlers.SaveQuestHandler)
 end
 
-function DRP:CreateAddonMenu()
-    DRP.LAM = LibAddonMenu2
+function DS:CreateAddonMenu()
+    DS.LAM = LibAddonMenu2
 
     -- Register & Initialize Addon Settings Panel
-    DRP.LAM:RegisterAddonPanel(DRP.name .. "_Settings", {
+    DS.LAM:RegisterAddonPanel(DS.name .. "_Settings", {
         type = "panel",
-        name = DRP.meta.name,
-        author = DRP.meta.author,
-        version = DRP.meta.version,
-        website = DRP.meta.website,
+        name = DS.meta.name,
+        author = DS.meta.author,
+        version = DS.meta.version,
+        website = DS.meta.website,
 
         registerForRefresh = true,
-        slashCommand = "/drp"
+        slashCommand = "/ds"
     })
 
     -- Register actual Addon Settings
-    DRP.LAM:RegisterOptionControls(DRP.name .. "_Settings", {
+    DS.LAM:RegisterOptionControls(DS.name .. "_Settings", {
         [1] = {
             type = "description",
             text = "This Addon attempts to set your Status on Discord based on your current location or activity in-game.\n\nIf you're using the |c00b3b3Priority Save|r option, it is unknown how fast your status will update. It seems to be random how long it takes for your status to be updated using this method. But at least with this option, you are avoiding an additional loading screen.\n\nNOTE: Don't forget to start |cff0000DiscordStatusClient.exe|r found in the |cdaa520Client|r folder that comes with the Addon."
@@ -102,16 +102,16 @@ function DRP:CreateAddonMenu()
             tooltip = "Automatically update presence when your active Zone or Activity changes.",
             default = true,
             getFunc = function()
-                return DRP.savedVars.ZO["settings"]["prioritySave"]
+                return DS.savedVars.ZO["settings"]["prioritySave"]
             end,
             setFunc = function(value)
-                DRP.savedVars.ZO["settings"]["prioritySave"] = value
+                DS.savedVars.ZO["settings"]["prioritySave"] = value
 
                 DRP_LAM_control_prioritySave:UpdateDisabled()
                 DRP_LAM_control_autoReload:UpdateDisabled()
             end,
             disabled = function()
-                if DRP.savedVars.ZO["settings"]["autoReload"] == true then
+                if DS.savedVars.ZO["settings"]["autoReload"] == true then
                     return true
                 end
 
@@ -127,16 +127,16 @@ function DRP:CreateAddonMenu()
             default = false,
             requiresReload = true,
             getFunc = function()
-                return DRP.savedVars.ZO["settings"]["autoReload"]
+                return DS.savedVars.ZO["settings"]["autoReload"]
             end,
             setFunc = function(value)
-                DRP.savedVars.ZO["settings"]["autoReload"] = value
+                DS.savedVars.ZO["settings"]["autoReload"] = value
 
                 DRP_LAM_control_prioritySave:UpdateDisabled()
                 DRP_LAM_control_autoReload:UpdateDisabled()
             end,
             disabled = function()
-                if DRP.savedVars.ZO["settings"]["prioritySave"] == true then
+                if DS.savedVars.ZO["settings"]["prioritySave"] == true then
                     return true
                 end
 
@@ -146,10 +146,10 @@ function DRP:CreateAddonMenu()
     })
 end
 
-function DRP:StoreCharacterData()
+function DS:StoreCharacterData()
     local u = "player"
-    local zo = DRP.savedVars.ZO
-    if zo == nil then DRP:CreateNewSavedVars() end
+    local zo = DS.savedVars.ZO
+    if zo == nil then DS:CreateNewSavedVars() end
 
     -- Character- and Zone-related Information
     zo["account"] = GetUnitDisplayName(u)
@@ -182,8 +182,8 @@ function DRP:StoreCharacterData()
     zo["bg_Description"] = GetBattlegroundDescription(bg)
 end
 
-function DRP.IsInDifferentZone()
-    if GetUnitZone("player") ~= DRP.savedVars.ZO["zone"] then
+function DS.IsInDifferentZone()
+    if GetUnitZone("player") ~= DS.savedVars.ZO["zone"] then
         return true
     end
 
@@ -194,36 +194,36 @@ end
 --                         HANDLERS                         --
 --------------------------------------------------------------
 
-function DRP.handlers.OnAddOnLoaded(event, addonName)
-    if addonName == DRP.name then
-        DRP:Initialize()
+function DS.handlers.OnAddOnLoaded(event, addonName)
+    if addonName == DS.name then
+        DS:Initialize()
     end
 end
 
-function DRP.handlers.OnPlayerActivated(event, isInitialLoad)
-    local isInDifZone = DRP:IsInDifferentZone()
+function DS.handlers.OnPlayerActivated(event, isInitialLoad)
+    local isInDifZone = DS:IsInDifferentZone()
     if isInDifZone == false then return end
 
-    DRP.StoreCharacterData()
+    DS.StoreCharacterData()
 
-    if DRP.savedVars.ZO["settings"]["prioritySave"] == true
+    if DS.savedVars.ZO["settings"]["prioritySave"] == true
     then
-        GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DRP.name)
+        GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DS.name)
     end
 
-    DRP.savedVars.ZO["reloaded"] = not DRP.savedVars.ZO["reloaded"]
+    DS.savedVars.ZO["reloaded"] = not DS.savedVars.ZO["reloaded"]
 
-    if DRP.savedVars.ZO["settings"]["autoReload"] == true
-    and DRP.savedVars.ZO["settings"]["prioritySave"] == false
-    and DRP.savedVars.ZO["reloaded"] == false
+    if DS.savedVars.ZO["settings"]["autoReload"] == true
+    and DS.savedVars.ZO["settings"]["prioritySave"] == false
+    and DS.savedVars.ZO["reloaded"] == false
     then
         ReloadUI()
     end
 end
 
-function DRP.handlers.SaveQuestHandler(event, journalIndex)
-    local zo = DRP.savedVars.ZO
-    if zo == nil then DRP:CreateNewSavedVars() end
+function DS.handlers.SaveQuestHandler(event, journalIndex)
+    local zo = DS.savedVars.ZO
+    if zo == nil then DS:CreateNewSavedVars() end
 
     local activeQuest = GetJournalQuestName(journalIndex)
     if zo["activeQuest"] == activeQuest
@@ -231,7 +231,7 @@ function DRP.handlers.SaveQuestHandler(event, journalIndex)
     then return end
 
     zo["activeQuest"] = activeQuest
-    GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DRP.name)
+    GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DS.name)
 end
 
-EVENT_MANAGER:RegisterForEvent(DRP.name, EVENT_ADD_ON_LOADED, DRP.handlers.OnAddOnLoaded)
+EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_ADD_ON_LOADED, DS.handlers.OnAddOnLoaded)

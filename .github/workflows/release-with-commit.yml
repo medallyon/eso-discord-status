@@ -13,7 +13,7 @@ jobs:
           regexp: "Version ((\\d+(?:\\.\\d+)*)(-(?:alpha|beta|rc)\\d*(?:(?:\\s|\\S)*))?)"
           regexp_options: "us"
           release_name: "Version $1"
-          tag_name: "v$1"
+          tag_name: "$1"
           body: ""
           draft: false
           prerelease: false

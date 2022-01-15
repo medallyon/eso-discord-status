@@ -25,43 +25,6 @@ namespace ESO_Discord_RichPresence_Client
         private readonly FolderBrowserDialog _browser;
         private readonly FileSystemWatcher _watcher;
 
-        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
-        {
-            Main = form;
-            _client = client;
-            _browser = browser;
-            _watcher = new FileSystemWatcher();
-        }
-
-        public void Initialise()
-        {
-            EsoDir = (string)Main.Settings.Get("CustomEsoLocation");
-
-            EnsureSavedVarsExist();
-            SetupWatcher();
-
-            if (!Exists)
-                return;
-
-            string luaContents = File.ReadAllText(Path);
-            Discord.CurrentCharacter = ParseLua(luaContents);
-        }
-
-        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
-        private void SetupWatcher()
-        {
-            _watcher.Path = $@"{Dir}";
-            _watcher.Filter = $"{Main.ADDON_NAME}.lua";
-            _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
-
-            _watcher.Created += OnChanged;
-            _watcher.Changed += OnChanged;
-            _watcher.Deleted += OnDeleted;
-            _watcher.Renamed += OnRenamed;
-
-            _watcher.EnableRaisingEvents = true;
-        }
-
         public static EsoCharacter ParseLua(string luaTable)
         {
             using (Lua luaClient = new Lua())
@@ -95,6 +58,28 @@ namespace ESO_Discord_RichPresence_Client
 
                 return new EsoCharacter((LuaTable)accounts.Values.First()["$AccountWide"]);
             }
+        }
+
+        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
+        {
+            Main = form;
+            _client = client;
+            _browser = browser;
+            _watcher = new FileSystemWatcher();
+        }
+
+        public void Initialise()
+        {
+            EsoDir = (string)Main.Settings.Get("CustomEsoLocation");
+
+            EnsureSavedVarsExist();
+            SetupWatcher();
+
+            if (!Exists)
+                return;
+
+            string luaContents = File.ReadAllText(Path);
+            Discord.CurrentCharacter = ParseLua(luaContents);
         }
 
         public void EnsureSavedVarsExist()
@@ -149,9 +134,25 @@ namespace ESO_Discord_RichPresence_Client
                 Exists = true;
         }
 
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
+        private void SetupWatcher()
+        {
+            _watcher.Path = $@"{Dir}";
+            _watcher.Filter = $"{Main.ADDON_NAME}.lua";
+            _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
+
+            _watcher.Created += OnChanged;
+            _watcher.Changed += OnChanged;
+            _watcher.Deleted += OnDeleted;
+            _watcher.Renamed += OnRenamed;
+
+            _watcher.EnableRaisingEvents = true;
+        }
+
         public void Reset()
         {
-
+            EsoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
+            EnsureSavedVarsExist();
         }
 
         private void OnChanged(object source, FileSystemEventArgs e)

@@ -404,7 +404,7 @@ namespace ESO_Discord_RichPresence_Client
 
         private void ResetButton_Click(object sender, EventArgs e)
         {
-            
+            _savedVars.Reset();
         }
 
         #endregion Settings Changes

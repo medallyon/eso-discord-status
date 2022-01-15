@@ -46,6 +46,7 @@
             this.Box_AutoExit = new System.Windows.Forms.CheckBox();
             this.Tooltip_Main = new System.Windows.Forms.ToolTip(this.components);
             this.Box_CloseLauncher = new System.Windows.Forms.CheckBox();
+            this.ResetButton = new System.Windows.Forms.Button();
             this.TrayContextMenu.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -179,7 +180,7 @@
             this.startEsoToolStripMenuItem.Name = "startEsoToolStripMenuItem";
             this.startEsoToolStripMenuItem.Size = new System.Drawing.Size(137, 22);
             this.startEsoToolStripMenuItem.Text = "Launch ESO";
-            this.startEsoToolStripMenuItem.Click += new System.EventHandler(this.startEsoToolStripMenuItem_Click);
+            this.startEsoToolStripMenuItem.Click += new System.EventHandler(this.StartEsoToolStripMenuItem_Click);
             // 
             // quitToolStripMenuItem
             // 
@@ -238,12 +239,23 @@
             this.Box_CloseLauncher.UseVisualStyleBackColor = true;
             this.Box_CloseLauncher.CheckedChanged += new System.EventHandler(this.Box_CloseLauncher_CheckedChanged);
             // 
+            // ResetButton
+            // 
+            this.ResetButton.Location = new System.Drawing.Point(25, 191);
+            this.ResetButton.Name = "ResetButton";
+            this.ResetButton.Size = new System.Drawing.Size(101, 23);
+            this.ResetButton.TabIndex = 9;
+            this.ResetButton.Text = "Reset Documents";
+            this.ResetButton.UseVisualStyleBackColor = true;
+            this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
+            // 
             // Main
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(54)))), ((int)(((byte)(57)))), ((int)(((byte)(62)))));
-            this.ClientSize = new System.Drawing.Size(354, 180);
+            this.ClientSize = new System.Drawing.Size(354, 246);
+            this.Controls.Add(this.ResetButton);
             this.Controls.Add(this.Box_CloseLauncher);
             this.Controls.Add(this.Box_AutoExit);
             this.Controls.Add(this.Box_AutoStart);
@@ -287,6 +299,7 @@
         private System.Windows.Forms.ToolTip Tooltip_Main;
         private System.Windows.Forms.ToolStripMenuItem quitToolStripMenuItem;
         private System.Windows.Forms.CheckBox Box_CloseLauncher;
+        private System.Windows.Forms.Button ResetButton;
     }
 }
 

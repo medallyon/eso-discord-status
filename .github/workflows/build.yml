@@ -83,11 +83,13 @@ jobs:
     # Upload the package zip to ESOUI
     - name: Push to ESOUI
       uses: M0RGaming/Push-To-EsoUI@v1.5
+      env:
+        version: ${{ github.ref_name }}
       with:
         EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
         ESOUIID: 2054
         version: ${{ github.ref_name }}
-        path: .\
-        readme: resources\esoui.md
-        changelog: resources\changelog.md
-        artifact: dist\DiscordStatus-v${{ github.ref_name }}.zip
+        path: "./resources/"
+        readme: "esoui.md"
+        changelog: "changelog.md"
+        artifact: "../dist/DiscordStatus-v$env:version.zip"

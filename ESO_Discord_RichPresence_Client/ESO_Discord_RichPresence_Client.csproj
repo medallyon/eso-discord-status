@@ -151,6 +151,12 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PackAddonFiles\PackAddonFiles.csproj">
+      <Project>{2dbeebc8-3894-4151-87a0-28615256ae77}</Project>
+      <Name>PackAddonFiles</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

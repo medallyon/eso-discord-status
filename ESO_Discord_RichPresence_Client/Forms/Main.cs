@@ -239,11 +239,15 @@ namespace ESO_Discord_RichPresence_Client
 
                 StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
                 _discordClient.UpdatePresence();
+
+                PlayButton.Enabled = false;
             }
             else if (!processExists && EsoIsRunning || !processExists)
             {
                 EsoIsRunning = false;
                 _discordClient.Disable();
+
+                PlayButton.Enabled = EsoLauncherProcess == null;
             }
 
             if (EsoIsRunning)
@@ -402,10 +406,9 @@ namespace ESO_Discord_RichPresence_Client
             _steamAppIdForm.Hide();
         }
 
-        private void ResetButton_Click(object sender, EventArgs e)
-        {
-            _savedVars.Reset();
-        }
+        private void PlayButton_Click(object sender, EventArgs e) => StartESO();
+
+        private void ResetButton_Click(object sender, EventArgs e) => _savedVars.Reset();
 
         #endregion Settings Changes
 

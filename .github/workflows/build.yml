@@ -62,15 +62,31 @@ jobs:
     - name: Create Distribution Package
       env:
         Configuration: ${{ matrix.configuration }}
+        Tag: ${{ github.ref_name }}
       run: |
         Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.config", "*.pdb", "*.xml", "*.dylib", "*.so" -Recurse -Force
       
         Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\dist\Client\" -Recurse -Force
         Copy-Item -Path ".\AddOn\*" -Destination ".\dist\" -Recurse -Force
+        
+        $compress = @{
+          Path = ".\dist\*"
+          CompressionLevel = "Fastest"
+          DestinationPath = ".\dist\DiscordStatus-v$env:Tag.zip"
+        }
+        Compress-Archive @compress
 
     # Upload compressed package
     - name: Upload build artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: Discord Status
+        name: DiscordStatus-v${{ github.ref_name }}
         path: .\dist\*
+
+    # Upload the package zip to the release that triggered this workflow
+    - name: Upload Release Zip
+      uses: svenstaro/upload-release-action@2.2.1
+      with:
+        repo_token: ${{ secrets.PAT }}
+        file: .\dist\DiscordStatus-v${{ github.ref_name }}.zip
+        tag: ${{ github.ref_name }}

@@ -77,5 +77,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ESO_Discord_RichPresence_Client\ESO_Discord_RichPresence_Client.csproj" />
+    <ProjectReference Include="..\PackAddonFiles\PackAddonFiles.csproj" />
   </ItemGroup>
 </Project>

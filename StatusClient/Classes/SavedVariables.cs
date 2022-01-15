@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
-using NLua;
+using System.Reflection;
 using System.Security.Permissions;
+using System.Text;
 using System.Threading;
 using System.Windows.Forms;
-using System.Drawing;
-using System.Text;
+using NLua;
 using NLua.Exceptions;
 
 namespace ESO_Discord_RichPresence_Client
@@ -15,15 +16,26 @@ namespace ESO_Discord_RichPresence_Client
     internal class SavedVariables
     {
         public static bool Exists;
-        public static string EsoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
+
+        public static string EsoDir =
+            Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
+
+        private readonly FolderBrowserDialog _browser;
+        private readonly Discord _client;
+        private readonly FileSystemWatcher _watcher;
+
+        internal readonly Main Main;
+
+        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
+        {
+            Main = form;
+            _client = client;
+            _browser = browser;
+            _watcher = new FileSystemWatcher();
+        }
 
         public static string Dir => $@"{EsoDir}\live\SavedVariables";
         public string Path => $@"{Dir}\{Main.ADDON_NAME}.lua";
-
-        internal readonly Main Main;
-        private readonly Discord _client;
-        private readonly FolderBrowserDialog _browser;
-        private readonly FileSystemWatcher _watcher;
 
         public static EsoCharacter ParseLua(string luaTable)
         {
@@ -38,7 +50,9 @@ namespace ESO_Discord_RichPresence_Client
 
                 catch (LuaException error)
                 {
-                    DialogResult luaErrorResponse = MessageBox.Show($"Something went wrong while reading data from ESO: {error.Message}", "Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+                    DialogResult luaErrorResponse =
+                        MessageBox.Show($"Something went wrong while reading data from ESO: {error.Message}", "Error",
+                            MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
 
                     if (luaErrorResponse == DialogResult.Retry)
                         ParseLua(luaTable);
@@ -47,30 +61,22 @@ namespace ESO_Discord_RichPresence_Client
                 }
 
                 LuaTable rootTable = luaClient.GetTable($"{Main.ADDON_NAME}_SavedVars");
-                LuaTable defaultTable = (LuaTable)rootTable["Default"];
+                LuaTable defaultTable = (LuaTable) rootTable["Default"];
 
                 var accounts = new Dictionary<object, LuaTable>();
                 foreach (object key in defaultTable.Keys)
                 {
-                    LuaTable value = (LuaTable)defaultTable[key];
+                    LuaTable value = (LuaTable) defaultTable[key];
                     accounts.Add(key, value);
                 }
 
-                return new EsoCharacter((LuaTable)accounts.Values.First()["$AccountWide"]);
+                return new EsoCharacter((LuaTable) accounts.Values.First()["$AccountWide"]);
             }
-        }
-
-        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
-        {
-            Main = form;
-            _client = client;
-            _browser = browser;
-            _watcher = new FileSystemWatcher();
         }
 
         public void Initialise()
         {
-            EsoDir = (string)Main.Settings.Get("CustomEsoLocation");
+            EsoDir = (string) Main.Settings.Get("CustomEsoLocation");
 
             EnsureSavedVarsExist();
             SetupWatcher();
@@ -87,20 +93,37 @@ namespace ESO_Discord_RichPresence_Client
             // "Elder Scrolls Online" doesn't exist in "My Documents"
             if (!Directory.Exists(EsoDir))
             {
-                DialogResult response = MessageBox.Show(@"Please select the ""Elder Scrolls Online"" folder in your Documents.", "File not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                Assembly exe = Assembly.GetExecutingAssembly();
+                DirectoryInfo cwd = new FileInfo(exe.Location).Directory;
 
-                if (response == DialogResult.OK)
+                if (cwd.Name == "Client" && cwd.Parent?.Name == Main.ADDON_NAME && cwd.Parent?.Parent?.Name == "AddOns")
                 {
-                    if (_browser.ShowDialog() == DialogResult.OK)
-                    {
-                        EsoDir = _browser.SelectedPath;
-                        Main.Settings.Set("CustomEsoLocation", EsoDir);
-                    }
-                    else
-                        Environment.Exit(1);
+                    EsoDir = cwd.Parent.Parent.Parent.Parent.FullName;
                 }
                 else
-                    Environment.Exit(1);
+                {
+                    DialogResult response =
+                        MessageBox.Show(@"Please select the ""Elder Scrolls Online"" folder in your Documents.",
+                            "File not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation,
+                            MessageBoxDefaultButton.Button1);
+
+                    if (response == DialogResult.OK)
+                    {
+                        if (_browser.ShowDialog() == DialogResult.OK)
+                        {
+                            EsoDir = _browser.SelectedPath;
+                            Main.Settings.Set("CustomEsoLocation", EsoDir);
+                        }
+                        else
+                        {
+                            Environment.Exit(1);
+                        }
+                    }
+                    else
+                    {
+                        Environment.Exit(1);
+                    }
+                }
             }
 
             // if LUA file doesn't exist in "SavedVariables"
@@ -109,7 +132,10 @@ namespace ESO_Discord_RichPresence_Client
                 // if ESO addon doesn't exist
                 if (!Directory.Exists($@"{EsoDir}\live\AddOns\{Main.ADDON_NAME}"))
                 {
-                    DialogResult addonResponse = MessageBox.Show($"The \"{Main.ADDON_NAME}\" AddOn was not detected in your Addons Folder. Do you want to install the addon and try again?", "AddOn Missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                    DialogResult addonResponse = MessageBox.Show(
+                        $"The \"{Main.ADDON_NAME}\" AddOn was not detected in your Addons Folder. Do you want to install the addon and try again?",
+                        "AddOn Missing", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation,
+                        MessageBoxDefaultButton.Button1);
 
                     if (addonResponse == DialogResult.OK)
                     {
@@ -117,7 +143,9 @@ namespace ESO_Discord_RichPresence_Client
                         EnsureSavedVarsExist();
                     }
                     else
+                    {
                         Environment.Exit(1);
+                    }
                 }
 
                 else
@@ -126,27 +154,38 @@ namespace ESO_Discord_RichPresence_Client
                     Main.InstallAddon();
 
                     Exists = false;
-                    Main.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
+                    Main.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod,
+                        FontStyle.Bold);
                 }
             }
 
             else
+            {
                 Exists = true;
+            }
         }
 
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         private void SetupWatcher()
         {
-            _watcher.Path = $@"{Dir}";
-            _watcher.Filter = $"{Main.ADDON_NAME}.lua";
-            _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
+            try
+            {
+                _watcher.Path = $@"{Dir}";
+                _watcher.Filter = $"{Main.ADDON_NAME}.lua";
+                _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
 
-            _watcher.Created += OnChanged;
-            _watcher.Changed += OnChanged;
-            _watcher.Deleted += OnDeleted;
-            _watcher.Renamed += OnRenamed;
+                _watcher.Created += OnChanged;
+                _watcher.Changed += OnChanged;
+                _watcher.Deleted += OnDeleted;
+                _watcher.Renamed += OnRenamed;
 
-            _watcher.EnableRaisingEvents = true;
+                _watcher.EnableRaisingEvents = true;
+            }
+
+            catch (ArgumentException err)
+            {
+                Reset();
+            }
         }
 
         public void Reset()
@@ -159,7 +198,7 @@ namespace ESO_Discord_RichPresence_Client
         {
             Console.WriteLine("SavedVariables file changed or created");
             Exists = true;
-            
+
             // wait 1 second here to avoid conflicts with file being busy
             Thread.Sleep(1000);
 
@@ -173,7 +212,9 @@ namespace ESO_Discord_RichPresence_Client
 
             catch (IOException error)
             {
-                DialogResult errorResponse = MessageBox.Show($"Something happened while updating your game: {error.Message}", "File Read Error", MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+                DialogResult errorResponse =
+                    MessageBox.Show($"Something happened while updating your game: {error.Message}", "File Read Error",
+                        MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
 
                 if (errorResponse == DialogResult.Abort)
                     Environment.Exit(1);

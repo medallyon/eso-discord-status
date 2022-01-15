@@ -16,7 +16,7 @@ jobs:
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
 
     env:
-      Solution_Name: ESO_Discord_RichPresence_Client
+      Solution_Name: StatusClient
       Test_Project_Path: your-test-project-path         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
 
     steps:

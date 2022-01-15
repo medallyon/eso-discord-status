@@ -160,7 +160,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>echo "Packaging AddOn directory..."
-"$(SolutionDir)PackAddonFiles\$(OutDir)PackAddonFiles.exe" "$(SolutionDir)AddOn" "$(ProjectDir)ADDON.PAF"</PreBuildEvent>
+"$(ProjectDir)..\PackAddonFiles\$(OutDir)PackAddonFiles.exe" "$(ProjectDir)..\AddOn" "$(ProjectDir)ADDON.PAF"</PreBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\KeraLua.1.2.14\build\net46\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.2.14\build\net46\KeraLua.targets')" />
 </Project>

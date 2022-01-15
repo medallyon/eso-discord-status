@@ -1,7 +1,6 @@
 name: Publish Latest Release
 
 on:
-  workflow_dispatch:
   release:
     types: [created]
 
@@ -56,11 +55,11 @@ jobs:
       run: |
         Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.config", "*.pdb", "*.xml", "*.dylib", "*.so" -Recurse -Force
       
-        Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\dist\Client\" -Recurse -Force
-        Copy-Item -Path ".\AddOn\*" -Destination ".\dist\" -Recurse -Force
+        Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\dist\DiscordStatus\Client\" -Recurse -Force
+        Copy-Item -Path ".\AddOn\*" -Destination ".\dist\DiscordStatus\" -Recurse -Force
         
         $compress = @{
-          Path = ".\dist\*"
+          Path = ".\dist\DiscordStatus\*"
           CompressionLevel = "Fastest"
           DestinationPath = ".\dist\DiscordStatus-v$env:Tag.zip"
         }
@@ -84,11 +83,13 @@ jobs:
     # Upload the package zip to ESOUI
     - name: Push to ESOUI
       uses: M0RGaming/Push-To-EsoUI@v1.5
+      env:
+        version: ${{ github.ref_name }}
       with:
         EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
         ESOUIID: 2054
         version: ${{ github.ref_name }}
-        path: .\
-        readme: resources\esoui.md
-        changelog: resources\changelog.md
-        artifact: dist\DiscordStatus-v${{ github.ref_name }}.zip
+        path: "./Resources/"
+        readme: "esoui.md"
+        changelog: "changelog.md"
+        artifact: "../dist/DiscordStatus-v$env:version.zip"

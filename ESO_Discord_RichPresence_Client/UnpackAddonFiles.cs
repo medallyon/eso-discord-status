@@ -11,7 +11,7 @@ namespace ESO_Discord_RichPresence_Client
         /// </summary>
         // This is done because there isn't a standard way in .NET that can pack files
         // that can be unpacked with every Windows versions, and cross-platform.
-        public static void UnpackAddon(string OutputPath)
+        public static void Unpack(string OutputPath)
         {
             Console.WriteLine($"Unpacking contents of addon to '{OutputPath}'...");
             Console.WriteLine();

@@ -2,7 +2,7 @@
 
 namespace ESO_Discord_RichPresence_Client
 {
-    class Discord : DiscordRpc
+    internal class Discord : DiscordRpc
     {
         public static EsoCharacter CurrentCharacter;
         private EsoCharacter _latestInstance;
@@ -11,155 +11,128 @@ namespace ESO_Discord_RichPresence_Client
         private string OptionalSteamAppID { get; set; }
         private int CallbackCalls { get; set; }
 
-        private bool Enabled
-        {
-            get
-            {
-                return (bool)this.Main.Settings.Get("Enabled");
-            }
-        }
-        private bool ShowCharacterName
-        {
-            get
-            {
-                return (bool)this.Main.Settings.Get("ShowCharacterName");
-            }
-        }
-        private bool ShowPartyInfo
-        {
-            get
-            {
-                return (bool)this.Main.Settings.Get("ShowPartyInfo");
-            }
-        }
+        private bool ShowCharacterName => (bool)Main.Settings.Get("ShowCharacterName");
+        private bool ShowPartyInfo => (bool)Main.Settings.Get("ShowPartyInfo");
 
         internal Main Main;
         public RichPresence PresenceData = new RichPresence();
-        private EventHandlers handlers;
+        private EventHandlers _handlers;
 
         public Discord(Main form, string appID)
         {
-            this.Main = form;
-            this.ApplicationID = appID;
+            Main = form;
+            ApplicationID = appID;
 
-            this.handlers = new EventHandlers
+            _handlers = new EventHandlers
             {
-                readyCallback = this.OnReady,
-                errorCallback = this.OnError
+                readyCallback = OnReady,
+                errorCallback = OnError
             };
         }
 
         public Discord(Main form, string appID, string steamAppID)
         {
-            this.Main = form;
-            this.ApplicationID = appID;
-            this.OptionalSteamAppID = steamAppID;
+            Main = form;
+            ApplicationID = appID;
+            OptionalSteamAppID = steamAppID;
 
-            this.handlers = new EventHandlers
+            _handlers = new EventHandlers
             {
-                readyCallback = this.OnReady,
-                errorCallback = this.OnError
+                readyCallback = OnReady,
+                errorCallback = OnError
             };
         }
 
         public void Enable()
         {
-            if (!this.Main.EsoIsRunning)
+            if (!Main.EsoIsRunning)
                 return;
 
-            this.CallbackCalls = 0;
-            this.PresenceData.startTimestamp = this.Main.StartTimestamp;
+            CallbackCalls = 0;
+            PresenceData.startTimestamp = Main.StartTimestamp;
 
-            Initialize(this.ApplicationID, ref this.handlers, false, this.OptionalSteamAppID);
+            Initialize(ApplicationID, ref _handlers, false, OptionalSteamAppID);
         }
 
         public void UpdatePresence()
         {
-            if (!this.Main.EsoIsRunning)
+            if (!Main.EsoIsRunning)
                 return;
 
-            this.UpdatePresence(Discord.CurrentCharacter);
-        }
-
-        public new void UpdatePresence(RichPresence data)
-        {
-            if (!this.Main.EsoIsRunning)
-                return;
-
-            DiscordRpc.UpdatePresence(data);
+            UpdatePresence(CurrentCharacter);
         }
 
         public void UpdatePresence(EsoCharacter character)
         {
-            if (!this.Main.EsoIsRunning || character == null)
+            if (!Main.EsoIsRunning || character == null)
                 return;
 
             // Character | Account (Level|CP)
-            this.PresenceData.details = $"{((this.ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
+            PresenceData.details = $"{((ShowCharacterName) ? character.Name : character.Account)} ({((character.IsChampion) ? "CP" : "Level ")}{character.Level})";
 
             // State + Image + Time Data
 
-            this.PresenceData.state = character.QuestName;
+            PresenceData.state = character.QuestName;
 
-            this.PresenceData.largeImageKey = Image_Keys.Locations.Get(character.Zone);
+            PresenceData.largeImageKey = Image_Keys.Locations.Get(character.Zone);
 
             // Try to get image for parent zone if not found; will probably still return default
-            if (this.PresenceData.largeImageKey == "default")
-                this.PresenceData.largeImageKey = Image_Keys.Locations.Get(character.ParentZone);
+            if (PresenceData.largeImageKey == "default")
+                PresenceData.largeImageKey = Image_Keys.Locations.Get(character.ParentZone);
 
-            this.PresenceData.largeImageText = (character.SubZone != null && character.SubZone.Length > 0) ? character.SubZone : character.Zone;
-            this.PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
-            this.PresenceData.smallImageText = character.Class;
+            PresenceData.largeImageText = (character.SubZone != null && character.SubZone.Length > 0) ? character.SubZone : character.Zone;
+            PresenceData.smallImageKey = $"class_{character.Class.ToLower()}";
+            PresenceData.smallImageText = character.Class;
 
-            this.PresenceData.startTimestamp = this.Main.StartTimestamp;
+            PresenceData.startTimestamp = Main.StartTimestamp;
 
             if (character.InDungeon)
             {
-                this.PresenceData.largeImageText = character.Dungeon;
+                PresenceData.largeImageText = character.Dungeon;
 
                 if (Image_Keys.Trials.IsValid(character.Dungeon) || Image_Keys.Dungeons.IsValid(character.Dungeon))
                 {
-                    this.PresenceData.state = (character.GroupRole != null) ? character.GroupRole : "";
+                    PresenceData.state = (character.GroupRole != null) ? character.GroupRole : "";
 
                     // Don't update timestamp if in same dungeon instance
-                    if (this._latestInstance != null
-                        && !(this._latestInstance.InDungeon
-                            && this._latestInstance.Dungeon == character.Dungeon
-                            && this._latestInstance.DungeonDifficulty == character.DungeonDifficulty
+                    if (_latestInstance != null
+                        && !(_latestInstance.InDungeon
+                            && _latestInstance.Dungeon == character.Dungeon
+                            && _latestInstance.DungeonDifficulty == character.DungeonDifficulty
                         )
                     )
-                        this.PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                        PresenceData.startTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
-                    this.PresenceData.largeImageKey = (Image_Keys.Trials.IsValid(character.Dungeon)) ? Image_Keys.Trials.Get(character.Dungeon) : Image_Keys.Dungeons.Get(character.Dungeon);
-                    this.PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
-                    this.PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
+                    PresenceData.largeImageKey = (Image_Keys.Trials.IsValid(character.Dungeon)) ? Image_Keys.Trials.Get(character.Dungeon) : Image_Keys.Dungeons.Get(character.Dungeon);
+                    PresenceData.smallImageKey = $"difficulty_{character.DungeonDifficulty.ToLower()}";
+                    PresenceData.smallImageText = $"{character.DungeonDifficulty} Mode";
                 }
             }
 
             // Party Data
 
-            this.PresenceData.partyMax = 0;
-            this.PresenceData.partySize = 0;
+            PresenceData.partyMax = 0;
+            PresenceData.partySize = 0;
 
-            if (this.ShowPartyInfo)
+            if (ShowPartyInfo)
             {
-                this.PresenceData.partyMax = ((character.GroupSize <= 4) ? 4 : ((character.GroupSize <= 12) ? 12 : 24));
-                this.PresenceData.partySize = character.GroupSize;
+                PresenceData.partyMax = ((character.GroupSize <= 4) ? 4 : ((character.GroupSize <= 12) ? 12 : 24));
+                PresenceData.partySize = character.GroupSize;
             }
 
-            DiscordRpc.UpdatePresence(this.PresenceData);
-            this._latestInstance = character;
+            DiscordRpc.UpdatePresence(PresenceData);
+            _latestInstance = character;
         }
 
         private void OnReady(ref DiscordUser connectedUser)
         {
-            this.CallbackCalls++;
+            CallbackCalls++;
             Console.WriteLine($"Discord: connected to {connectedUser.username}#{connectedUser.discriminator} (ID {connectedUser.userId})");
         }
 
         private void OnError(int errorCode, string message)
         {
-            this.CallbackCalls++;
+            CallbackCalls++;
             Console.WriteLine($"Discord: error {errorCode}: {message}");
         }
 

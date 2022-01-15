@@ -2,34 +2,22 @@
 
 namespace ESO_Discord_RichPresence_Client
 {
-    class EsoCharacter
+    internal class EsoCharacter
     {
         public string Name { get; set; }
         public string Account { get; set; }
         public string Race { get; set; }
         public string Class { get; set; }
 
-        private int genderInt;
-        public string Gender
-        {
-            get
-            {
-                switch (this.genderInt)
-                {
-                    case 1:
-                        return "Female";
-                    default:
-                        return "Male";
-                }
-            }
-        }
+        private readonly int _genderInt;
+        public string Gender => _genderInt == 1 ? "Female" : "Male";
 
-        private int allianceInt;
+        private readonly int _allianceInt;
         public string Alliance
         {
             get
             {
-                switch (this.allianceInt)
+                switch (_allianceInt)
                 {
                     case 1:
                         return "Aldmeri Dominion";
@@ -50,12 +38,12 @@ namespace ESO_Discord_RichPresence_Client
         public bool IsGrouped { get; set; }
         public int GroupSize { get; set; }
 
-        private int groupRoleInt;
+        private readonly int _groupRoleInt;
         public string GroupRole
         {
             get
             {
-                switch (this.groupRoleInt)
+                switch (_groupRoleInt)
                 {
                     case 1:
                         return "DPS";
@@ -72,12 +60,12 @@ namespace ESO_Discord_RichPresence_Client
         public bool InDungeon { get; set; }
         public string Dungeon { get; set; }
 
-        private int dungeonDifficultyInt;
+        private readonly int _dungeonDifficultyInt;
         public string DungeonDifficulty
         {
             get
             {
-                switch (this.dungeonDifficultyInt)
+                switch (_dungeonDifficultyInt)
                 {
                     case 1:
                         return "Normal";
@@ -89,42 +77,42 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
 
-        public int Battlegrounds_GameType { get; set; }
-        public string Battlegrounds_Name { get; set; }
-        public string Battlegrounds_Description { get; set; }
+        public int BattlegroundsGameType { get; set; }
+        public string BattlegroundsName { get; set; }
+        public string BattlegroundsDescription { get; set; }
 
         public string QuestName { get; set; }
 
         public EsoCharacter(LuaTable character)
         {
-            this.Name = (string)character["name"];
-            this.Account = (string)character["account"];
-            this.Race = (string)character["race"];
-            this.Class = (string)character["class"];
-            this.genderInt = (int)(long)character["gender"];
-            this.allianceInt = (int)(long)character["alliance"];
-            this.ParentZone = (string)character["parentZone"];
-            this.Zone = (string)character["zone"];
-            this.SubZone = (string)character["subZone"];
-            this.IsChampion = (bool)character["isChampion"];
-            this.Level = (int)(long)character["level"];
+            Name = (string)character["name"];
+            Account = (string)character["account"];
+            Race = (string)character["race"];
+            Class = (string)character["class"];
+            _genderInt = (int)(long)character["gender"];
+            _allianceInt = (int)(long)character["alliance"];
+            ParentZone = (string)character["parentZone"];
+            Zone = (string)character["zone"];
+            SubZone = (string)character["subZone"];
+            IsChampion = (bool)character["isChampion"];
+            Level = (int)(long)character["level"];
 
-            this.IsGrouped = (bool)character["isGrouped"];
-            this.GroupSize = (int)(long)character["groupSize"];
-            this.groupRoleInt = (int)(long)character["groupRole"];
-            this.InDungeon = (bool)character["inDungeon"];
-            this.dungeonDifficultyInt = (int)(long)character["isDungeonVeteran"];
+            IsGrouped = (bool)character["isGrouped"];
+            GroupSize = (int)(long)character["groupSize"];
+            _groupRoleInt = (int)(long)character["groupRole"];
+            InDungeon = (bool)character["inDungeon"];
+            _dungeonDifficultyInt = (int)(long)character["isDungeonVeteran"];
 
-            this.Battlegrounds_GameType = (int)(long)character["bg_GameType"];
-            this.Battlegrounds_Name = (string)character["bg_Name"];
-            this.Battlegrounds_Description = (string)character["bg_Description"];
+            BattlegroundsGameType = (int)(long)character["bg_GameType"];
+            BattlegroundsName = (string)character["bg_Name"];
+            BattlegroundsDescription = (string)character["bg_Description"];
 
-            this.QuestName = (string)character["activeQuest"];
+            QuestName = (string)character["activeQuest"];
 
-            if (this.InDungeon)
+            if (InDungeon)
             {
-                this.Dungeon = this.Zone;
-                this.Zone = (string)character["parentZone"];
+                Dungeon = Zone;
+                Zone = (string)character["parentZone"];
             }
         }
     }

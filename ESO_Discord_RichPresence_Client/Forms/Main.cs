@@ -12,32 +12,90 @@ namespace ESO_Discord_RichPresence_Client
     {
         public const string DISCORD_CLIENT_ID = "453713122713272331";
         public const string ESO_STEAM_APP_ID = "306130";
-        public const string ADDON_NAME = "DiscordRichPresence";
+        public const string ADDON_NAME = "DiscordStatus";
 
         public Settings Settings;
-        private Timer EsoTimer;
-        private Timer CloseTimer;
-        private SavedVariables SavedVars;
-        private Discord DiscordClient;
-        private SteamAppIdForm SteamAppIdForm;
+        private Timer _esoTimer;
+        private Timer _closeTimer;
+        private SavedVariables _savedVars;
+        private Discord _discordClient;
+        private SteamAppIdForm _steamAppIdForm;
 
         public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-        public bool EsoIsRunning { get; set; } = false;
-        public bool EsoRanOnce { get; set; } = false;
-        public bool JustMinimized { get; set; } = false;
+        public bool EsoIsRunning { get; set; }
+        public bool EsoRanOnce { get; set; }
+        public bool JustMinimized { get; set; }
+
+        public Process EsoProcess
+        {
+            get
+            {
+                var pName = Process.GetProcessesByName("eso64");
+                return pName.Length > 0 ? pName[0] : null;
+            }
+        }
+        public Process EsoLauncherProcess
+        {
+            get
+            {
+                var pName = Process.GetProcessesByName("Bethesda.net_Launcher");
+                return pName.Length > 0 ? pName[0] : null;
+            }
+        }
 
         public Main()
         {
             InitializeComponent();
         }
 
-        private bool IsEsoRunning()
+        private void Main_Load(object sender, EventArgs e)
         {
-            Process[] pName = Process.GetProcessesByName("eso64");
-            if (pName.Length > 0)
-                return true;
+            Settings = new Settings();
 
-            return false;
+            HandleDuplicateClient();
+
+            _discordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
+            _savedVars = new SavedVariables(this, _discordClient, FolderBrowser);
+
+            CreateSteamAppIdForm();
+            InitialiseSettings();
+            _savedVars.Initialise();
+
+            InitEsoTimers();
+        }
+
+        private void InitialiseSettings()
+        {
+            Box_Enabled.Checked = (bool)Settings.Get("Enabled");
+            Box_CharacterName.Checked = (bool)Settings.Get("ShowCharacterName");
+            Box_ShowGroup.Checked = (bool)Settings.Get("ShowPartyInfo");
+            Box_ToTray.Checked = (bool)Settings.Get("ToTray");
+            Box_StayTopMost.Checked = (bool)Settings.Get("StayTopMost");
+            Box_AutoStart.Checked = (bool)Settings.Get("AutoStart");
+            Box_AutoExit.Checked = (bool)Settings.Get("AutoExit");
+            Box_CloseLauncher.Checked = (bool)Settings.Get("CloseLauncher");
+
+            if (Settings.Get("CustomSteamAppID") != null)
+                _steamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)Settings.Get("CustomSteamAppID");
+
+            if ((bool)Settings.Get("AutoStart"))
+                StartESO();
+        }
+
+        private void InitEsoTimers()
+        {
+            _esoTimer = new Timer { Interval = 1000 };
+            _esoTimer.Tick += UpdateClientStatus;
+            _esoTimer.Start();
+
+            _closeTimer = new Timer { Interval = 1000 };
+            _closeTimer.Tick += CloseTimer_Tick;
+        }
+
+        private void CloseTimer_Tick(object sender, EventArgs e)
+        {
+            _closeTimer.Stop();
+            EsoLauncherProcess?.Kill();
         }
 
         private void HandleDuplicateClient()
@@ -45,135 +103,95 @@ namespace ESO_Discord_RichPresence_Client
             Process[] defaultProcesses = Process.GetProcessesByName("ESO_Discord_RichPresence_Client")
                 , customProcesses = Process.GetProcessesByName("DiscordStatusClient");
 
-            // Concat arrays
-            Process[] runningProcesses = new Process[defaultProcesses.Length + customProcesses.Length];
+            // Concatenate arrays
+            var runningProcesses = new Process[defaultProcesses.Length + customProcesses.Length];
             defaultProcesses.CopyTo(runningProcesses, 0);
             customProcesses.CopyTo(runningProcesses, defaultProcesses.Length);
 
-            if (runningProcesses.Length == 1)
+            if (runningProcesses.Length == 1 || !(bool)Settings.Get("AutoStart"))
                 return;
 
-            if ((bool)this.Settings.Get("AutoStart"))
-            {
-                this.StartESO();
-                Application.Exit();
-            }
-        }
-
-        private void Main_Load(object sender, EventArgs e)
-        {
-            this.Settings = new Settings();
-
-            this.HandleDuplicateClient();
-
-            this.DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
-            this.SavedVars = new SavedVariables(this, this.DiscordClient, this.FolderBrowser);
-
-            this.CreateSteamAppIdForm();
-            this.InitialiseSettings();
-            this.SavedVars.Initialise();
-
-            this.InitEsoTimers();
+            StartESO();
+            Application.Exit();
         }
 
         private void CreateSteamAppIdForm()
         {
-            this.SteamAppIdForm = new SteamAppIdForm();
-            this.SteamAppIdForm.Hide();
+            _steamAppIdForm = new SteamAppIdForm();
+            _steamAppIdForm.Hide();
 
-            this.UpdateSteamAppIdFormLocation();
+            UpdateSteamAppIdFormLocation();
             
-            var textBoxControl = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true).First();
+            Control textBoxControl = _steamAppIdForm.Controls.Find("SteamIdTextBox", true).First();
             textBoxControl.KeyDown += AppIdTextBox_KeyDown;
             textBoxControl.LostFocus += AppIdTextBox_LostFocus;
         }
 
         private void UpdateSteamAppIdFormLocation()
         {
-            this.SteamAppIdForm.Location = new Point(
-                this.Location.X + (this.Width / 2) - (this.SteamAppIdForm.Width / 2),
-                this.Location.Y + (this.Height / 3) - (this.SteamAppIdForm.Height / 2)
+            _steamAppIdForm.Location = new Point(
+                Location.X + (Width / 2) - (_steamAppIdForm.Width / 2),
+                Location.Y + (Height / 3) - (_steamAppIdForm.Height / 2)
             );
-        }
-
-        private void InitialiseSettings()
-        {
-            this.Box_Enabled.Checked = (bool)this.Settings.Get("Enabled");
-            this.Box_CharacterName.Checked = (bool)this.Settings.Get("ShowCharacterName");
-            this.Box_ShowGroup.Checked = (bool)this.Settings.Get("ShowPartyInfo");
-            this.Box_ToTray.Checked = (bool)this.Settings.Get("ToTray");
-            this.Box_StayTopMost.Checked = (bool)this.Settings.Get("StayTopMost");
-            this.Box_AutoStart.Checked = (bool)this.Settings.Get("AutoStart");
-            this.Box_AutoExit.Checked = (bool)this.Settings.Get("AutoExit");
-            this.Box_CloseLauncher.Checked = (bool)this.Settings.Get("CloseLauncher");
-
-            if (this.Settings.Get("CustomSteamAppID") != null)
-                this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)this.Settings.Get("CustomSteamAppID");
-
-            if ((bool)this.Settings.Get("AutoStart"))
-                this.StartESO();
         }
 
         private void StartESO()
         {
-            if (this.IsEsoRunning())
+            if (EsoProcess != null)
                 return;
 
-            if (this.Settings.Get("CustomSteamAppID") != null && this.Settings.Get("CustomSteamAppID").ToString().Length >= 5)
+            if (Settings.Get("CustomSteamAppID") != null && Settings.Get("CustomSteamAppID").ToString().Length >= 5)
             {
-                Process.Start($"steam://rungameid/{(string)this.Settings.Get("CustomSteamAppID")}");
+                Process.Start($"steam://rungameid/{(string)Settings.Get("CustomSteamAppID")}");
                 return;
             }
 
-            const string SteamBaseKey = "SOFTWARE\\WOW6432Node\\Valve\\Steam";
-            const string EsoBaseKey = "SOFTWARE\\WOW6432Node\\Zenimax_Online\\Launcher";
+            const string steamBaseKey = "SOFTWARE\\WOW6432Node\\Valve\\Steam";
+            const string esoBaseKey = "SOFTWARE\\WOW6432Node\\Zenimax_Online\\Launcher";
 
-            RegistryKey SteamRegistryKey = Registry.LocalMachine.OpenSubKey(SteamBaseKey);
-            RegistryKey EsoRegistryKey;
+            RegistryKey steamRegistryKey = Registry.LocalMachine.OpenSubKey(steamBaseKey);
+            RegistryKey esoRegistryKey;
 
             // Steam is installed
-            if (SteamRegistryKey != null)
+            if (steamRegistryKey != null)
             {
-                string SteamEsoBaseKey = $"{SteamBaseKey}\\Apps\\{Main.ESO_STEAM_APP_ID}";
-                EsoRegistryKey = Registry.LocalMachine.OpenSubKey(SteamEsoBaseKey);
+                string steamEsoBaseKey = $"{steamBaseKey}\\Apps\\{ESO_STEAM_APP_ID}";
+                esoRegistryKey = Registry.LocalMachine.OpenSubKey(steamEsoBaseKey);
 
                 // ESO is installed through Steam
-                if (EsoRegistryKey != null)
+                if (esoRegistryKey != null)
                 {
-                    Process.Start($"steam://rungameid/{Main.ESO_STEAM_APP_ID}");
+                    Process.Start($"steam://rungameid/{ESO_STEAM_APP_ID}");
                     return;
                 }
             }
 
-            EsoRegistryKey = Registry.LocalMachine.OpenSubKey(EsoBaseKey);
-            string EsoInstallLocation;
+            esoRegistryKey = Registry.LocalMachine.OpenSubKey(esoBaseKey);
+            string esoInstallLocation;
 
             // ESO cannot be found
-            if (EsoRegistryKey == null)
+            if (esoRegistryKey == null)
             {
                 DialogResult response = MessageBox.Show("ESO could not be found. Please select your ESO folder.", "ESO not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
 
                 if (response == DialogResult.Cancel)
                     return;
-                else
-                {
-                    if (this.FolderBrowser.ShowDialog() == DialogResult.OK)
-                    {
-                        EsoInstallLocation = this.FolderBrowser.SelectedPath;
-                        this.Settings.Set("CustomEsoInstallLocation", this.FolderBrowser.SelectedPath);
-                    }
 
-                    else
-                        return;
+                if (FolderBrowser.ShowDialog() == DialogResult.OK)
+                {
+                    esoInstallLocation = FolderBrowser.SelectedPath;
+                    Settings.Set("CustomEsoInstallLocation", FolderBrowser.SelectedPath);
                 }
+                else
+                    return;
             }
 
             // ESO is installed
             else
-                EsoInstallLocation = (string)EsoRegistryKey.GetValue("InstallPath");
+                esoInstallLocation = (string)esoRegistryKey.GetValue("InstallPath");
 
-            string EsoLauncherPath = $"{EsoInstallLocation}\\Launcher\\Bethesda.net_Launcher.exe";
-            if (!File.Exists(EsoLauncherPath))
+            string esoLauncherPath = $"{esoInstallLocation}\\Launcher\\Bethesda.net_Launcher.exe";
+            if (!File.Exists(esoLauncherPath))
             {
                 MessageBox.Show("ESO could not be found. Please make sure ESO is installed correctly, then try again.", "ESO not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
                 return;
@@ -181,265 +199,249 @@ namespace ESO_Discord_RichPresence_Client
             
             Process.Start(new ProcessStartInfo
             {
-                FileName = EsoLauncherPath,
-                WorkingDirectory = $"{EsoInstallLocation}\\Launcher"
+                FileName = esoLauncherPath,
+                WorkingDirectory = $"{esoInstallLocation}\\Launcher"
             });
         }
 
-        private void InitEsoTimers()
+        public void UpdateStatusField(string status, Color newColor, FontStyle style = FontStyle.Regular)
         {
-            EsoTimer = new Timer { Interval = 1000 };
-            EsoTimer.Tick += UpdateClientStatus;
-            EsoTimer.Start();
+            if (Label_EsoIsRunning.InvokeRequired)
+            {
+                Label_EsoIsRunning.Invoke(new MethodInvoker(delegate {
+                    Label_EsoIsRunning.ForeColor = newColor;
+                    Label_EsoIsRunning.Font = new Font(Label_EsoIsRunning.Font, style);
+                    Label_EsoIsRunning.Text = status;
+                }));
+            }
 
-            CloseTimer = new Timer { Interval = 1000 };
-            CloseTimer.Tick += CloseTimer_Tick;
+            else
+            {
+                Label_EsoIsRunning.ForeColor = newColor;
+                Label_EsoIsRunning.Font = new Font(Label_EsoIsRunning.Font, style);
+                Label_EsoIsRunning.Text = status;
+            }
         }
 
         private void UpdateClientStatus(object sender, EventArgs e)
         {
             if (!SavedVariables.Exists)
             {
-                this.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
+                UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
                 return;
             }
 
-            Process[] processes = Process.GetProcessesByName("eso64");
-            if (processes.Length > 0 && !this.EsoIsRunning)
+            bool processExists = EsoProcess != null;
+            if (processExists && !EsoIsRunning)
             {
-                this.EsoIsRunning = true;
-                this.DiscordClient.Enable();
+                EsoIsRunning = true;
+                _discordClient.Enable();
 
-                this.StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-                this.DiscordClient.UpdatePresence();
+                StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+                _discordClient.UpdatePresence();
+            }
+            else if (!processExists && EsoIsRunning || !processExists)
+            {
+                EsoIsRunning = false;
+                _discordClient.Disable();
             }
 
-            else if ((processes.Length == 0 && this.EsoIsRunning) || processes.Length == 0)
+            if (EsoIsRunning)
             {
-                this.EsoIsRunning = false;
-                this.DiscordClient.Disable();
-            }
+                EsoRanOnce = true;
 
-            if (this.EsoIsRunning)
-            {
-                this.EsoRanOnce = true;
-
-                if ((bool)this.Settings.Get("CloseLauncher"))
+                if ((bool)Settings.Get("CloseLauncher"))
                 {
-                    // Close the launcher after 1s
-                    CloseTimer.Start();
+                    // Close the launcher after 1 second
+                    _closeTimer.Start();
                 }
 
-                if (!this.JustMinimized)
+                if (!JustMinimized)
                 {
-                    this.JustMinimized = true;
-                    this.Minimize();
+                    JustMinimized = true;
+                    Minimize();
                 }
 
-                this.UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
+                UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
             }
-
             else
             {
-                if ((bool)this.Settings.Get("AutoExit") && this.EsoRanOnce)
+                if ((bool)Settings.Get("AutoExit") && EsoRanOnce)
                     Application.Exit();
 
-                this.JustMinimized = false;
+                JustMinimized = false;
 
-                this.UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
+                UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
             }
 
-            this.TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = !EsoIsRunning;
-        }
-
-        private void CloseTimer_Tick(object sender, EventArgs e)
-        {
-            CloseTimer.Stop();
-            Process[] processes = Process.GetProcessesByName("Bethesda.net_Launcher");
-            if (processes.Length > 0)
-                processes[0].Kill();
-        }
-
-        public void UpdateStatusField(string status)
-        {
-            this.UpdateStatusField(status, Color.DarkGray);
-        }
-        public void UpdateStatusField(string status, Color newColor, FontStyle style = FontStyle.Regular)
-        {
-            if (this.Label_EsoIsRunning.InvokeRequired)
-            {
-                this.Label_EsoIsRunning.Invoke(new MethodInvoker(delegate {
-                    this.Label_EsoIsRunning.ForeColor = newColor;
-                    this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, style);
-                    this.Label_EsoIsRunning.Text = status;
-                }));
-            }
-
-            else
-            {
-                this.Label_EsoIsRunning.ForeColor = newColor;
-                this.Label_EsoIsRunning.Font = new Font(this.Label_EsoIsRunning.Font, style);
-                this.Label_EsoIsRunning.Text = status;
-            }
+            TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = !EsoIsRunning;
         }
 
         public void InstallAddon()
         {
-            string AddonDirectory = $@"{SavedVariables.esoDir}\live\AddOns\{Main.ADDON_NAME}";
+            string addonDirectory = $@"{SavedVariables.EsoDir}\live\AddOns\{ADDON_NAME}";
 
-            if (Directory.Exists(AddonDirectory))
-                Directory.Delete(AddonDirectory, true);
-            Directory.CreateDirectory(AddonDirectory);
+            if (Directory.Exists(addonDirectory))
+                Directory.Delete(addonDirectory, true);
+            Directory.CreateDirectory(addonDirectory);
 
-            UnpackAddonFiles.UnpackAddon(AddonDirectory);
+            UnpackAddonFiles.Unpack(addonDirectory);
         }
+
+        #region Settings Changes
 
         private void Box_Enabled_CheckedChanged(object sender, EventArgs e)
         {
-            if (this.Box_Enabled.Checked && !(bool)this.Settings.Get("Enabled") && Discord.CurrentCharacter != null)
+            if (Box_Enabled.Checked && !(bool)Settings.Get("Enabled") && Discord.CurrentCharacter != null)
             {
-                this.DiscordClient.Enable();
-                this.DiscordClient.UpdatePresence();
+                _discordClient.Enable();
+                _discordClient.UpdatePresence();
             }
 
-            else if (!this.Box_Enabled.Checked && (bool)this.Settings.Get("Enabled") && Discord.CurrentCharacter != null)
-                this.DiscordClient.Disable();
+            else if (!Box_Enabled.Checked && (bool)Settings.Get("Enabled") && Discord.CurrentCharacter != null)
+                _discordClient.Disable();
 
-            this.Settings.Set("Enabled", this.Box_Enabled.Checked);
+            Settings.Set("Enabled", Box_Enabled.Checked);
         }
 
         private void Box_CharacterName_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.Set("ShowCharacterName", this.Box_CharacterName.Checked);
+            Settings.Set("ShowCharacterName", Box_CharacterName.Checked);
             if (Discord.CurrentCharacter != null)
-                this.DiscordClient.UpdatePresence();
+                _discordClient.UpdatePresence();
         }
 
         private void Box_ShowGroup_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.Set("ShowPartyInfo", this.Box_ShowGroup.Checked);
+            Settings.Set("ShowPartyInfo", Box_ShowGroup.Checked);
             if (Discord.CurrentCharacter != null)
-                this.DiscordClient.UpdatePresence();
+                _discordClient.UpdatePresence();
         }
 
         private void Box_ToTray_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.Set("ToTray", this.Box_ToTray.Checked);
+            Settings.Set("ToTray", Box_ToTray.Checked);
         }
 
         private void Main_Resize(object sender, EventArgs e)
         {
-            if (this.WindowState == FormWindowState.Minimized && (bool)this.Settings.Get("ToTray"))
-                this.MinimizeToTray();
+            if (WindowState == FormWindowState.Minimized && (bool)Settings.Get("ToTray"))
+                MinimizeToTray();
         }
 
         private void Minimize()
         {
-            if ((bool)this.Settings.Get("ToTray"))
-                this.MinimizeToTray();
+            if ((bool)Settings.Get("ToTray"))
+                MinimizeToTray();
             else
-                this.WindowState = FormWindowState.Minimized;
+                WindowState = FormWindowState.Minimized;
         }
 
         private void MinimizeToTray()
         {
-            this.TrayIcon.Visible = true;
-            this.Hide();
+            TrayIcon.Visible = true;
+            Hide();
 
-            if (!(bool)this.Settings.Get("MinimizedOnce"))
-            {
-                this.Settings.Set("MinimizedOnce", true);
-                this.TrayIcon.ShowBalloonTip(2000);
-            }
+            if ((bool)Settings.Get("MinimizedOnce"))
+                return;
+
+            Settings.Set("MinimizedOnce", true);
+            TrayIcon.ShowBalloonTip(2000);
         }
 
         private void Box_StayTopMost_CheckedChanged(object sender, EventArgs e)
         {
-            this.TopMost = this.Box_StayTopMost.Checked;
+            TopMost = Box_StayTopMost.Checked;
 
-            this.Settings.Set("StayTopMost", this.TopMost);
+            Settings.Set("StayTopMost", TopMost);
         }
 
         private void Box_AutoStart_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.Set("AutoStart", this.Box_AutoStart.Checked);
+            Settings.Set("AutoStart", Box_AutoStart.Checked);
         }
 
         private void Box_CloseLauncher_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.Set("CloseLauncher", this.Box_CloseLauncher.Checked);
+            Settings.Set("CloseLauncher", Box_CloseLauncher.Checked);
         }
 
         private void Box_AutoExit_CheckedChanged(object sender, EventArgs e)
         {
-            this.Settings.Set("AutoExit", this.Box_AutoExit.Checked);
+            Settings.Set("AutoExit", Box_AutoExit.Checked);
         }
 
         private void Box_AutoStart_MouseClick(object sender, MouseEventArgs e)
         {
-            if (e.Button == MouseButtons.Right)
-            {
-                this.TopMost = false;
-                this.UpdateSteamAppIdFormLocation();
-                this.SteamAppIdForm.Show();
-            }
+            if (e.Button != MouseButtons.Right)
+                return;
+
+            TopMost = false;
+            UpdateSteamAppIdFormLocation();
+            _steamAppIdForm.Show();
         }
 
         private void AppIdTextBox_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.KeyData == Keys.Enter)
-            {
-                Control SteamIdTextBox = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
-                this.Settings.Set("CustomSteamAppID", SteamIdTextBox.Text);
+            if (e.KeyData != Keys.Enter)
+                return;
 
-                this.TopMost = (bool)this.Settings.Get("StayTopMost");
-                this.SteamAppIdForm.Hide();
-            }
+            Control steamIdTextBox = _steamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
+            Settings.Set("CustomSteamAppID", steamIdTextBox.Text);
+
+            TopMost = (bool)Settings.Get("StayTopMost");
+            _steamAppIdForm.Hide();
         }
 
         private void AppIdTextBox_LostFocus(object sender, EventArgs e)
         {
-            Control SteamIdTextBox = this.SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
-            this.Settings.Set("CustomSteamAppID", SteamIdTextBox.Text);
+            Control steamIdTextBox = _steamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
+            Settings.Set("CustomSteamAppID", steamIdTextBox.Text);
 
-            this.TopMost = (bool)this.Settings.Get("StayTopMost");
-            this.SteamAppIdForm.Hide();
+            TopMost = (bool)Settings.Get("StayTopMost");
+            _steamAppIdForm.Hide();
         }
+
+        private void ResetButton_Click(object sender, EventArgs e)
+        {
+            
+        }
+
+        #endregion Settings Changes
 
         private void ShowClient()
         {
-            this.Show();
-            this.WindowState = FormWindowState.Normal;
-            this.TrayIcon.Visible = false;
+            Show();
+            WindowState = FormWindowState.Normal;
+            TrayIcon.Visible = false;
         }
 
-        private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e)
-        {
-            this.ShowClient();
-        }
+        #region Tray Icon
+
+        private void TrayIcon_MouseDoubleClick(object sender, MouseEventArgs e) => ShowClient();
 
         private void TrayIcon_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button != MouseButtons.Right)
                 return;
 
-            this.TrayContextMenu.Show(Cursor.Position);
+            TrayContextMenu.Show(Cursor.Position);
         }
+
+        #region Tray Context Menu
 
         private void ShowToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.TrayContextMenu.Hide();
-            this.ShowClient();
+            TrayContextMenu.Hide();
+            ShowClient();
         }
 
-        private void QuitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            Application.Exit();
-        }
+        private void QuitToolStripMenuItem_Click(object sender, EventArgs e) => Application.Exit();
 
-        private void startEsoToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            this.StartESO();
-        }
+        private void StartEsoToolStripMenuItem_Click(object sender, EventArgs e) => StartESO();
+
+        #endregion Tray Context Menu
+
+        #endregion Tray Icon
     }
 }

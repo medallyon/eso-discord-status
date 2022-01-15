@@ -1,4 +1,4 @@
-name: .NET Core Desktop
+name: Publish Latest Release
 
 on:
   workflow_dispatch:
@@ -80,3 +80,15 @@ jobs:
         repo_token: ${{ secrets.PAT }}
         file: .\dist\DiscordStatus-v${{ github.ref_name }}.zip
         tag: ${{ github.ref_name }}
+
+    # Upload the package zip to ESOUI
+    - name: Push to ESOUI
+      uses: M0RGaming/Push-To-EsoUI@v1.5
+      with:
+        EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
+        ESOUIID: 2054
+        version: ${{ github.ref_name }}
+        path: .\
+        readme: resources\esoui.md
+        changelog: resources\changelog.md
+        artifact: dist\DiscordStatus-v${{ github.ref_name }}.zip

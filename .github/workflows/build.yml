@@ -1,26 +1,86 @@
-name: .NET
+name: .NET Core Desktop
 
 on:
   workflow_dispatch:
+  release:
+    types: [created]
 
 jobs:
+
   build:
-    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        configuration: [Release]
+
+    runs-on: windows-latest  # For a list of available runner types, refer to
+                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+
+    env:
+      Solution_Name: ESO_Discord_RichPresence_Client
+      Test_Project_Path: your-test-project-path         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
 
     steps:
-
     - name: Checkout
       uses: actions/checkout@v2
       with:
         fetch-depth: 0
 
-    - name: Setup .NET
+    # Install the .NET Core workload
+    - name: Install .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 5.0.x
 
-    - name: Restore dependencies
-      run: dotnet restore
+    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
 
-    - name: Build
-      run: dotnet build --no-restore
+    # Execute all unit tests in the solution
+    # - name: Execute unit tests
+    #   run: dotnet test
+
+    # Restore the application to populate the obj folder with RuntimeIdentifiers
+    - name: Restore the application
+      run: msbuild $env:Solution_Name.sln /t:Restore /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # Restore any NuGet dependencies
+    - name: Restore NuGet Dependencies
+      run: nuget restore
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+      # Pre-build the PackAddonFiles project
+#     - name: Build PAF
+#       run: msbuild $env:Solution_Name.sln -target:PackAddonFiles /p:Configuration=$env:Configuration
+#       env:
+#         Configuration: ${{ matrix.configuration }}
+
+    # Create the app package by building and packaging the Windows Application Packaging project
+    - name: Create the app package
+      run: msbuild $env:Solution_Name.sln /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # Use Copy-Item and Compress-Archive to create a zip
+    - name: Create Distribution Package
+      env:
+        Configuration: ${{ matrix.configuration }}
+      run: |
+        Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\Client\" -Recurse -Force
+        
+        $pkg = @{
+          Path = ".\AddOn\*", ".\Client\"
+          CompressionLevel = "Fastest"
+          DestinationPath = ".\DiscordStatus.zip"
+        }
+        Compress-Archive @pkg
+
+    # Upload compressed package
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: Discord Status
+        path: .\DiscordStatus.zip

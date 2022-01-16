@@ -54,7 +54,7 @@ jobs:
     - name: Create Distribution Package
       env:
         Configuration: ${{ matrix.configuration }}
-        Tag: ${{ github.ref_name }}
+        Tag: ${{ github.events.inputs.version }}
       run: |
         Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.config", "*.pdb", "*.xml", "*.dylib", "*.so" -Recurse -Force
       
@@ -72,12 +72,12 @@ jobs:
     - name: Push to ESOUI
       uses: Medallyon/Push-To-EsoUI@v2.0.0
       env:
-        version: ${{ github.ref_name }}
+        version: ${{ github.events.inputs.version }}
       with:
         EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
         ESOUIID: 2054
         version: ${{ github.events.inputs.version }}
         readme: "Resources/description.md"
         changelog: "Resources/changelog.txt"
-        artifact: "dist/DiscordStatus-v$env:version.zip"
+        artifact: "dist/DiscordStatus-v$version.zip"
         dryRun: ${{ github.events.inputs.dryRun }}

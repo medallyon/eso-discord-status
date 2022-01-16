@@ -1,4 +1,8 @@
-15-01-2022: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.4.5
+16-01-2022: Make automatic ESO Documents detection smarter
+
+15-01-2022: Some minor string clarifications & selecting the ESO Docs path easier should now be easier
+
+15-01-2022: Rearrangement of some components in the Client, addition of buttons & labels, and the ability to reset your ESO Documents path
 
 12-01-2022: https://github.com/Medallyon/eso-discord-rich-presence-client/releases/tag/0.4.4
 

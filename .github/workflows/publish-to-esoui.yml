@@ -4,10 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        type: environment
         required: true
       dryRun:
         type: boolean
+        required: false
 
 jobs:
   build:

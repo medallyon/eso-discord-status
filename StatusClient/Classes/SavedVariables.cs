@@ -17,8 +17,11 @@ namespace ESO_Discord_RichPresence_Client
     {
         public static bool Exists;
 
-        public static string EsoDir =
-            Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
+        public static string EsoPath { get; set; }
+
+        public static DirectoryInfo AddonDir => new DirectoryInfo($@"{EsoPath}\live\AddOns\{Main.ADDON_NAME}");
+        public static DirectoryInfo SavedVarsDir => new DirectoryInfo($@"{EsoPath}\live\SavedVariables");
+        public FileInfo SavedVarsFile => new FileInfo($@"{SavedVarsDir.FullName}\{Main.ADDON_NAME}.lua");
 
         private readonly FolderBrowserDialog _browser;
         private readonly Discord _client;
@@ -33,9 +36,6 @@ namespace ESO_Discord_RichPresence_Client
             _browser = browser;
             _watcher = new FileSystemWatcher();
         }
-
-        public static string Dir => $@"{EsoDir}\live\SavedVariables";
-        public string Path => $@"{Dir}\{Main.ADDON_NAME}.lua";
 
         public static EsoCharacter ParseLua(string luaTable)
         {
@@ -74,9 +74,23 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
 
+        public static DirectoryInfo GetParentEsoDir(string selectedPath)
+        {
+            DirectoryInfo dir = new DirectoryInfo(selectedPath);
+            while (dir.Parent != null)
+            {
+                if (dir.FullName == Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\Elder Scrolls Online")
+                    return dir;
+
+                dir = dir.Parent;
+            }
+
+            return null;
+        }
+
         public void Initialise()
         {
-            EsoDir = (string) Main.Settings.Get("CustomEsoLocation");
+            EsoPath = (string) Main.Settings.Get("CustomEsoLocation");
 
             EnsureSavedVarsExist();
             SetupWatcher();
@@ -84,21 +98,23 @@ namespace ESO_Discord_RichPresence_Client
             if (!Exists)
                 return;
 
-            string luaContents = File.ReadAllText(Path);
+            string luaContents = File.ReadAllText(SavedVarsFile.FullName);
             Discord.CurrentCharacter = ParseLua(luaContents);
         }
 
         public void EnsureSavedVarsExist()
         {
             // "Elder Scrolls Online" doesn't exist in "My Documents"
-            if (!Directory.Exists(EsoDir))
+            if (!Directory.Exists(EsoPath))
             {
                 Assembly exe = Assembly.GetExecutingAssembly();
                 DirectoryInfo cwd = new FileInfo(exe.Location).Directory;
 
+                // Attempt to infer whether we're in the "Elder Scrolls Online" AddOns directory already
                 if (cwd.Name == "Client" && cwd.Parent?.Name == Main.ADDON_NAME && cwd.Parent?.Parent?.Name == "AddOns")
                 {
-                    EsoDir = cwd.Parent.Parent.Parent.Parent.FullName;
+                    EsoPath = cwd.Parent.Parent.Parent.Parent.FullName;
+                    Main.Settings.Set("CustomEsoLocation", EsoPath);
                 }
                 else
                 {
@@ -109,10 +125,29 @@ namespace ESO_Discord_RichPresence_Client
 
                     if (response == DialogResult.OK)
                     {
+                        // User selected a custom directory
                         if (_browser.ShowDialog() == DialogResult.OK)
                         {
-                            EsoDir = _browser.SelectedPath;
-                            Main.Settings.Set("CustomEsoLocation", EsoDir);
+                            // If the selected path is not part of "My Documents/Elder Scrolls Online", keep showing the dialog
+                            while (GetParentEsoDir(_browser.SelectedPath) == null)
+                            {
+                                response = MessageBox.Show(@"The Directory you selected is not part of your Documents. Please Try again.",
+                                    "Directory Mismatch", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation,
+                                    MessageBoxDefaultButton.Button1);
+
+                                if (response == DialogResult.OK)
+                                {
+                                    if (_browser.ShowDialog() != DialogResult.OK)
+                                        Environment.Exit(1);
+                                }
+                                else
+                                {
+                                    Environment.Exit(1);
+                                }
+                            }
+
+                            EsoPath = GetParentEsoDir(_browser.SelectedPath).FullName;
+                            Main.Settings.Set("CustomEsoLocation", EsoPath);
                         }
                         else
                         {
@@ -127,10 +162,10 @@ namespace ESO_Discord_RichPresence_Client
             }
 
             // if LUA file doesn't exist in "SavedVariables"
-            if (!File.Exists($@"{Dir}\{Main.ADDON_NAME}.lua"))
+            if (!SavedVarsFile.Exists)
             {
                 // if ESO addon doesn't exist
-                if (!Directory.Exists($@"{EsoDir}\live\AddOns\{Main.ADDON_NAME}"))
+                if (!AddonDir.Exists)
                 {
                     DialogResult addonResponse = MessageBox.Show(
                         $"The \"{Main.ADDON_NAME}\" AddOn was not detected in your Addons Folder. Do you want to install the addon and try again?",
@@ -170,8 +205,8 @@ namespace ESO_Discord_RichPresence_Client
         {
             try
             {
-                _watcher.Path = $@"{Dir}";
-                _watcher.Filter = $"{Main.ADDON_NAME}.lua";
+                _watcher.Path = SavedVarsDir.FullName;
+                _watcher.Filter = SavedVarsFile.Name;
                 _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.FileName;
 
                 _watcher.Created += OnChanged;
@@ -190,7 +225,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void Reset()
         {
-            EsoDir = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
+            EsoPath = Environment.ExpandEnvironmentVariables(@"%USERPROFILE%\Documents\Elder Scrolls Online");
             EnsureSavedVarsExist();
         }
 

@@ -77,7 +77,7 @@ jobs:
         EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
         ESOUIID: 2054
         version: ${{ github.events.inputs.version }}
-        readme: "Resources/esoui.md"
-        changelog: "Resources/changelog.md"
+        readme: "Resources/description.md"
+        changelog: "Resources/changelog.txt"
         artifact: "dist/DiscordStatus-v$env:version.zip"
         dryRun: ${{ github.events.inputs.dryRun }}

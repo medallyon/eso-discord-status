@@ -68,6 +68,8 @@ jobs:
         }
         Compress-Archive @compress
 
+        Tree . /F
+
     # Upload the package zip to ESOUI
     - name: Push to ESOUI
       uses: Medallyon/Push-To-EsoUI@v2.0.0
@@ -79,5 +81,5 @@ jobs:
         version: ${{ github.events.inputs.version }}
         readme: "Resources/description.md"
         changelog: "Resources/changelog.txt"
-        artifact: "dist/DiscordStatus-v$version.zip"
+        artifact: "dist/DiscordStatus-v${{ github.events.inputs.version }}.zip"
         dryRun: ${{ github.events.inputs.dryRun }}

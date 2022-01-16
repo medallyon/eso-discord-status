@@ -59,7 +59,7 @@ jobs:
         Copy-Item -Path ".\AddOn\*" -Destination ".\dist\DiscordStatus\" -Recurse -Force
         
         $compress = @{
-          Path = ".\dist\DiscordStatus\*"
+          Path = ".\dist\DiscordStatus"
           CompressionLevel = "Fastest"
           DestinationPath = ".\dist\DiscordStatus-v$env:Tag.zip"
         }

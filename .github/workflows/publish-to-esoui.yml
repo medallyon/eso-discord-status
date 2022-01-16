@@ -1,0 +1,83 @@
+name: Publish to ESOUI
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        type: environment
+        required: true
+      dryRun:
+        type: boolean
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        configuration: [Release]
+
+    runs-on: windows-latest  # For a list of available runner types, refer to
+                             # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
+
+    env:
+      Solution_Name: StatusClient
+      Test_Project_Path: your-test-project-path         # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    # Install the .NET Core workload
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    # Add  MSBuild to the PATH: https://github.com/microsoft/setup-msbuild
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    # Restore any NuGet dependencies
+    - name: Restore NuGet Dependencies
+      run: nuget restore
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # Create the app package by building and packaging the Windows Application Packaging project
+    - name: Create the app package
+      run: msbuild $env:Solution_Name.sln /p:Configuration=$env:Configuration
+      env:
+        Configuration: ${{ matrix.configuration }}
+
+    # Use Copy-Item and Compress-Archive to create a zip
+    - name: Create Distribution Package
+      env:
+        Configuration: ${{ matrix.configuration }}
+        Tag: ${{ github.ref_name }}
+      run: |
+        Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.config", "*.pdb", "*.xml", "*.dylib", "*.so" -Recurse -Force
+      
+        Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\dist\DiscordStatus\Client\" -Recurse -Force
+        Copy-Item -Path ".\AddOn\*" -Destination ".\dist\DiscordStatus\" -Recurse -Force
+        
+        $compress = @{
+          Path = ".\dist\DiscordStatus"
+          CompressionLevel = "Fastest"
+          DestinationPath = ".\dist\DiscordStatus-v$env:Tag.zip"
+        }
+        Compress-Archive @compress
+
+    # Upload the package zip to ESOUI
+    - name: Push to ESOUI
+      uses: Medallyon/Push-To-EsoUI@v1.6.1
+      env:
+        version: ${{ github.ref_name }}
+      with:
+        EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
+        ESOUIID: 2054
+        version: ${{ github.events.inputs.version }}
+        readme: "Resources/esoui.md"
+        changelog: "Resources/changelog.md"
+        artifact: "dist/DiscordStatus-v$env:version.zip"
+        dryRun: ${{ github.events.inputs.dryRun }}

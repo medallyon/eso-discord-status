@@ -85,7 +85,7 @@ namespace ESO_Discord_RichPresence_Client
         private void InitEsoTimers()
         {
             _esoTimer = new Timer { Interval = 1000 };
-            _esoTimer.Tick += UpdateClientStatus;
+            _esoTimer.Tick += Update_Tick;
             _esoTimer.Start();
 
             _closeTimer = new Timer { Interval = 1000 };
@@ -223,7 +223,7 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
 
-        private void UpdateClientStatus(object sender, EventArgs e)
+        private void Update_Tick(object sender, EventArgs e)
         {
             if (!SavedVariables.Exists)
             {
@@ -283,7 +283,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void InstallAddon()
         {
-            string addonDirectory = $@"{SavedVariables.EsoDir}\live\AddOns\{ADDON_NAME}";
+            string addonDirectory = $@"{SavedVariables.EsoPath}\live\AddOns\{ADDON_NAME}";
 
             if (Directory.Exists(addonDirectory))
                 Directory.Delete(addonDirectory, true);

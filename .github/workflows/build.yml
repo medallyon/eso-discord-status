@@ -83,12 +83,10 @@ jobs:
     # Upload the package zip to ESOUI
     - name: Push to ESOUI
       uses: Medallyon/Push-To-EsoUI@v2.0.0
-      env:
-        version: ${{ github.ref_name }}
       with:
         EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
         ESOUIID: 2054
         version: ${{ github.ref_name }}
         readme: "Resources/description.md"
         changelog: "Resources/changelog.txt"
-        artifact: "dist/DiscordStatus-v$env:version.zip"
+        artifact: "dist/DiscordStatus-v${{ github.ref_name }}.zip"

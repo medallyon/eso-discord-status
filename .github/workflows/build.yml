@@ -53,7 +53,7 @@ jobs:
         Configuration: ${{ matrix.configuration }}
         Tag: ${{ github.ref_name }}
       run: |
-        Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.pdb", "*.xml", "*.dylib", "*.so" -Recurse -Force
+        Remove-Item ".\$env:Solution_Name\bin\$env:Configuration\*" -Include "*.pdb" -Recurse -Force
       
         Copy-Item -Path ".\$env:Solution_Name\bin\$env:Configuration\" -Destination ".\dist\DiscordStatus\Client\" -Recurse -Force
         Copy-Item -Path ".\AddOn\*" -Destination ".\dist\DiscordStatus\" -Recurse -Force

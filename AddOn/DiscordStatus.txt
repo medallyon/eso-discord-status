@@ -2,7 +2,7 @@
 ## Title: |c7289DADiscord|r Status
 ## Author: |cDAA520@Medallyon|cABABAB#5012|r
 ## Description: This Addon attempts to sync your in-game activity with your Discord Status. It takes a while to automatically update, depending on what settings you choose. Type |c358CD4/ds|r to edit these settings.
-## Version: 0.4.7
+## Version: 1.0.0
 ## SavedVariables: DiscordStatus_SavedVars
 ## DependsOn: LibAddonMenu-2.0
 

@@ -1,6 +1,5 @@
 DS = {}
 DS.handlers = {}
-DS.commands = {}
 
 DS.name = "DiscordStatus"
 
@@ -22,6 +21,7 @@ DS.savedVars.defaults = {
         ["autoReload"] = false
     },
     ["reloaded"] = true,
+    ["isLoggedIn"] = false,
 
     ["account"] = nil,
     ["name"] = nil,
@@ -59,9 +59,15 @@ function DS:CreateNewSavedVars()
 end
 
 function DS:Initialize()
-    if DS.savedVars.ZO == nil then DS:CreateNewSavedVars() end
+    EVENT_MANAGER:UnregisterForEvent(DS.name, EVENT_ADD_ON_LOADED)
+
+    if DS.savedVars.ZO == nil then
+        DS:CreateNewSavedVars()
+    end
 
     DS:CreateAddonMenu()
+
+    ZO_PreHook("Logout", DS.Logout)
 
     -- Register Event for after a loading screen / zone change
     EVENT_MANAGER:RegisterForEvent(DS.name, EVENT_PLAYER_ACTIVATED, DS.handlers.OnPlayerActivated)
@@ -95,21 +101,25 @@ function DS:CreateAddonMenu()
             type = "description",
             text = "This Addon attempts to set your Status on Discord based on your current location or activity in-game.\n\nIf you're using the |c00b3b3Priority Save|r option, it is unknown how fast your status will update. It seems to be random how long it takes for your status to be updated using this method. But at least with this option, you are avoiding an additional loading screen.\n\nNOTE: Don't forget to start |cff0000DiscordStatusClient.exe|r found in the |cdaa520Client|r folder that comes with the Addon."
         },
+
         [2] = {
             type = "checkbox",
             reference = "DRP_LAM_control_prioritySave",
             name = "Use Priority Save",
             tooltip = "Automatically update presence when your active Zone or Activity changes.",
             default = true,
+
             getFunc = function()
                 return DS.savedVars.ZO["settings"]["prioritySave"]
             end,
+
             setFunc = function(value)
                 DS.savedVars.ZO["settings"]["prioritySave"] = value
 
                 DRP_LAM_control_prioritySave:UpdateDisabled()
                 DRP_LAM_control_autoReload:UpdateDisabled()
             end,
+
             disabled = function()
                 if DS.savedVars.ZO["settings"]["autoReload"] == true then
                     return true
@@ -118,6 +128,7 @@ function DS:CreateAddonMenu()
                 return false
             end
         },
+
         [3] = {
             type = "checkbox",
             reference = "DRP_LAM_control_autoReload",
@@ -126,15 +137,18 @@ function DS:CreateAddonMenu()
             warning = "This will effectively double your time spent in loading screens.",
             default = false,
             requiresReload = true,
+
             getFunc = function()
                 return DS.savedVars.ZO["settings"]["autoReload"]
             end,
+
             setFunc = function(value)
                 DS.savedVars.ZO["settings"]["autoReload"] = value
 
                 DRP_LAM_control_prioritySave:UpdateDisabled()
                 DRP_LAM_control_autoReload:UpdateDisabled()
             end,
+
             disabled = function()
                 if DS.savedVars.ZO["settings"]["prioritySave"] == true then
                     return true
@@ -149,7 +163,9 @@ end
 function DS:StoreCharacterData()
     local u = "player"
     local zo = DS.savedVars.ZO
-    if zo == nil then DS:CreateNewSavedVars() end
+    if zo == nil then
+        DS:CreateNewSavedVars()
+    end
 
     -- Character- and Zone-related Information
     zo["account"] = GetUnitDisplayName(u)
@@ -190,6 +206,13 @@ function DS.IsInDifferentZone()
     return false
 end
 
+function DS.Logout()
+    DS.savedVars.ZO["isLoggedIn"] = false;
+
+    -- ensure the original function is called afterwards
+    return false;
+end
+
 --------------------------------------------------------------
 --                         HANDLERS                         --
 --------------------------------------------------------------
@@ -201,21 +224,22 @@ function DS.handlers.OnAddOnLoaded(event, addonName)
 end
 
 function DS.handlers.OnPlayerActivated(event, isInitialLoad)
+    DS.savedVars.ZO["isLoggedIn"] = true;
+
     local isInDifZone = DS:IsInDifferentZone()
     if isInDifZone == false then return end
 
     DS.StoreCharacterData()
 
-    if DS.savedVars.ZO["settings"]["prioritySave"] == true
-    then
+    if DS.savedVars.ZO["settings"]["prioritySave"] == true then
         GetAddOnManager():RequestAddOnSavedVariablesPrioritySave(DS.name)
     end
 
     DS.savedVars.ZO["reloaded"] = not DS.savedVars.ZO["reloaded"]
 
     if DS.savedVars.ZO["settings"]["autoReload"] == true
-    and DS.savedVars.ZO["settings"]["prioritySave"] == false
-    and DS.savedVars.ZO["reloaded"] == false
+        and DS.savedVars.ZO["settings"]["prioritySave"] == false
+        and DS.savedVars.ZO["reloaded"] == false
     then
         ReloadUI()
     end
@@ -223,11 +247,13 @@ end
 
 function DS.handlers.SaveQuestHandler(event, journalIndex)
     local zo = DS.savedVars.ZO
-    if zo == nil then DS:CreateNewSavedVars() end
+    if zo == nil then
+        DS:CreateNewSavedVars()
+    end
 
     local activeQuest = GetJournalQuestName(journalIndex)
     if zo["activeQuest"] == activeQuest
-    or zo["settings"]["prioritySave"] == false
+        or zo["settings"]["prioritySave"] == false
     then return end
 
     zo["activeQuest"] = activeQuest

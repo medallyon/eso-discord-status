@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
     public class Settings : Dictionary<string, object>
     {

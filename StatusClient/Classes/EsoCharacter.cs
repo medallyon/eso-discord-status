@@ -1,8 +1,8 @@
 ﻿using NLua;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
-    internal class EsoCharacter
+    public class EsoCharacter
     {
         public string Name { get; set; }
         public string Account { get; set; }

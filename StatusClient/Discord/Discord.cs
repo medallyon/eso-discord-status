@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
-    internal class Discord : DiscordRpc
+    public class Discord : DiscordRpc
     {
         public static EsoCharacter CurrentCharacter;
         private EsoCharacter _latestInstance;
@@ -45,7 +45,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void Enable()
         {
-            if (!Main.EsoIsRunning)
+            if (!Main.EsoClient.Exists)
                 return;
 
             CallbackCalls = 0;
@@ -56,7 +56,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void UpdatePresence()
         {
-            if (!Main.EsoIsRunning)
+            if (!Main.EsoClient.Exists)
                 return;
 
             UpdatePresence(CurrentCharacter);
@@ -64,7 +64,7 @@ namespace ESO_Discord_RichPresence_Client
 
         public void UpdatePresence(EsoCharacter character)
         {
-            if (!Main.EsoIsRunning || character == null)
+            if (!Main.EsoClient.Exists || character == null)
                 return;
 
             // Character | Account (Level|CP)

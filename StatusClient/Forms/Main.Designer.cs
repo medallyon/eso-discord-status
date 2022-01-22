@@ -1,4 +1,4 @@
-﻿namespace ESO_Discord_RichPresence_Client
+﻿namespace DiscordStatus
 {
     partial class Main
     {
@@ -33,16 +33,17 @@
             System.Windows.Forms.FlowLayoutPanel flowLayoutPanel2;
             System.Windows.Forms.Label SettingsLabel;
             System.Windows.Forms.Label BehaviourLabel;
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             System.Windows.Forms.Label ActionsLabel;
             System.Windows.Forms.Panel panel1;
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Main));
             this.Box_AutoStart = new System.Windows.Forms.CheckBox();
             this.Box_AutoExit = new System.Windows.Forms.CheckBox();
             this.Box_CloseLauncher = new System.Windows.Forms.CheckBox();
+            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.Box_Enabled = new System.Windows.Forms.CheckBox();
-            this.FolderBrowser = new System.Windows.Forms.FolderBrowserDialog();
             this.Box_CharacterName = new System.Windows.Forms.CheckBox();
             this.Box_ShowGroup = new System.Windows.Forms.CheckBox();
+            this.FolderBrowser = new System.Windows.Forms.FolderBrowserDialog();
             this.Box_StayTopMost = new System.Windows.Forms.CheckBox();
             this.Label_EsoIsRunning = new System.Windows.Forms.Label();
             this.Box_ToTray = new System.Windows.Forms.CheckBox();
@@ -53,7 +54,6 @@
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.Tooltip_Main = new System.Windows.Forms.ToolTip(this.components);
             this.ResetButton = new System.Windows.Forms.Button();
-            this.flowLayoutPanel1 = new System.Windows.Forms.FlowLayoutPanel();
             this.flowLayoutPanel3 = new System.Windows.Forms.FlowLayoutPanel();
             this.PlayButton = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
@@ -66,10 +66,10 @@
             ActionsLabel = new System.Windows.Forms.Label();
             panel1 = new System.Windows.Forms.Panel();
             flowLayoutPanel2.SuspendLayout();
-            this.TrayContextMenu.SuspendLayout();
-            this.flowLayoutPanel1.SuspendLayout();
-            this.flowLayoutPanel3.SuspendLayout();
             panel1.SuspendLayout();
+            this.flowLayoutPanel1.SuspendLayout();
+            this.TrayContextMenu.SuspendLayout();
+            this.flowLayoutPanel3.SuspendLayout();
             this.panel2.SuspendLayout();
             this.panel3.SuspendLayout();
             this.panel4.SuspendLayout();
@@ -81,7 +81,7 @@
             PresenceLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             PresenceLabel.Location = new System.Drawing.Point(3, 0);
             PresenceLabel.Name = "PresenceLabel";
-            PresenceLabel.Size = new System.Drawing.Size(74, 16);
+            PresenceLabel.Size = new System.Drawing.Size(73, 16);
             PresenceLabel.TabIndex = 10;
             PresenceLabel.Text = "Presence";
             PresenceLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -153,7 +153,7 @@
             SettingsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             SettingsLabel.Location = new System.Drawing.Point(3, 0);
             SettingsLabel.Name = "SettingsLabel";
-            SettingsLabel.Size = new System.Drawing.Size(64, 16);
+            SettingsLabel.Size = new System.Drawing.Size(63, 16);
             SettingsLabel.TabIndex = 13;
             SettingsLabel.Text = "Settings";
             SettingsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -164,10 +164,40 @@
             BehaviourLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             BehaviourLabel.Location = new System.Drawing.Point(3, 1);
             BehaviourLabel.Name = "BehaviourLabel";
-            BehaviourLabel.Size = new System.Drawing.Size(78, 16);
+            BehaviourLabel.Size = new System.Drawing.Size(77, 16);
             BehaviourLabel.TabIndex = 15;
             BehaviourLabel.Text = "Behaviour";
             BehaviourLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // ActionsLabel
+            // 
+            ActionsLabel.AutoSize = true;
+            ActionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            ActionsLabel.Location = new System.Drawing.Point(3, 0);
+            ActionsLabel.Name = "ActionsLabel";
+            ActionsLabel.Size = new System.Drawing.Size(58, 16);
+            ActionsLabel.TabIndex = 16;
+            ActionsLabel.Text = "Actions";
+            ActionsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            // 
+            // panel1
+            // 
+            panel1.Controls.Add(PresenceLabel);
+            panel1.Controls.Add(this.flowLayoutPanel1);
+            panel1.Location = new System.Drawing.Point(28, 56);
+            panel1.Name = "panel1";
+            panel1.Size = new System.Drawing.Size(140, 96);
+            panel1.TabIndex = 17;
+            // 
+            // flowLayoutPanel1
+            // 
+            this.flowLayoutPanel1.Controls.Add(this.Box_Enabled);
+            this.flowLayoutPanel1.Controls.Add(this.Box_CharacterName);
+            this.flowLayoutPanel1.Controls.Add(this.Box_ShowGroup);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 19);
+            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(140, 77);
+            this.flowLayoutPanel1.TabIndex = 11;
             // 
             // Box_Enabled
             // 
@@ -184,10 +214,6 @@
             this.Tooltip_Main.SetToolTip(this.Box_Enabled, "Whether Discord Rich Presence should be shown on your profile.");
             this.Box_Enabled.UseVisualStyleBackColor = true;
             this.Box_Enabled.CheckedChanged += new System.EventHandler(this.Box_Enabled_CheckedChanged);
-            // 
-            // FolderBrowser
-            // 
-            this.FolderBrowser.ShowNewFolderButton = false;
             // 
             // Box_CharacterName
             // 
@@ -222,6 +248,10 @@
             this.Tooltip_Main.SetToolTip(this.Box_ShowGroup, "Displays your active Party if enabled. Has no effect if you\'re not in a Party.");
             this.Box_ShowGroup.UseVisualStyleBackColor = true;
             this.Box_ShowGroup.CheckedChanged += new System.EventHandler(this.Box_ShowGroup_CheckedChanged);
+            // 
+            // FolderBrowser
+            // 
+            this.FolderBrowser.ShowNewFolderButton = false;
             // 
             // Box_StayTopMost
             // 
@@ -319,16 +349,6 @@
             this.ResetButton.UseVisualStyleBackColor = true;
             this.ResetButton.Click += new System.EventHandler(this.ResetButton_Click);
             // 
-            // flowLayoutPanel1
-            // 
-            this.flowLayoutPanel1.Controls.Add(this.Box_Enabled);
-            this.flowLayoutPanel1.Controls.Add(this.Box_CharacterName);
-            this.flowLayoutPanel1.Controls.Add(this.Box_ShowGroup);
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(0, 19);
-            this.flowLayoutPanel1.Name = "flowLayoutPanel1";
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(140, 77);
-            this.flowLayoutPanel1.TabIndex = 11;
-            // 
             // flowLayoutPanel3
             // 
             this.flowLayoutPanel3.Controls.Add(this.Box_StayTopMost);
@@ -337,17 +357,6 @@
             this.flowLayoutPanel3.Name = "flowLayoutPanel3";
             this.flowLayoutPanel3.Size = new System.Drawing.Size(140, 49);
             this.flowLayoutPanel3.TabIndex = 14;
-            // 
-            // ActionsLabel
-            // 
-            ActionsLabel.AutoSize = true;
-            ActionsLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))), System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            ActionsLabel.Location = new System.Drawing.Point(3, 0);
-            ActionsLabel.Name = "ActionsLabel";
-            ActionsLabel.Size = new System.Drawing.Size(59, 16);
-            ActionsLabel.TabIndex = 16;
-            ActionsLabel.Text = "Actions";
-            ActionsLabel.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             // 
             // PlayButton
             // 
@@ -362,15 +371,6 @@
             this.PlayButton.Text = "PLAY";
             this.PlayButton.UseVisualStyleBackColor = true;
             this.PlayButton.Click += new System.EventHandler(this.PlayButton_Click);
-            // 
-            // panel1
-            // 
-            panel1.Controls.Add(PresenceLabel);
-            panel1.Controls.Add(this.flowLayoutPanel1);
-            panel1.Location = new System.Drawing.Point(28, 56);
-            panel1.Name = "panel1";
-            panel1.Size = new System.Drawing.Size(140, 96);
-            panel1.TabIndex = 17;
             // 
             // panel2
             // 
@@ -423,13 +423,13 @@
             this.Resize += new System.EventHandler(this.Main_Resize);
             flowLayoutPanel2.ResumeLayout(false);
             flowLayoutPanel2.PerformLayout();
-            this.TrayContextMenu.ResumeLayout(false);
-            this.flowLayoutPanel1.ResumeLayout(false);
-            this.flowLayoutPanel1.PerformLayout();
-            this.flowLayoutPanel3.ResumeLayout(false);
-            this.flowLayoutPanel3.PerformLayout();
             panel1.ResumeLayout(false);
             panel1.PerformLayout();
+            this.flowLayoutPanel1.ResumeLayout(false);
+            this.flowLayoutPanel1.PerformLayout();
+            this.TrayContextMenu.ResumeLayout(false);
+            this.flowLayoutPanel3.ResumeLayout(false);
+            this.flowLayoutPanel3.PerformLayout();
             this.panel2.ResumeLayout(false);
             this.panel2.PerformLayout();
             this.panel3.ResumeLayout(false);
@@ -443,7 +443,6 @@
         #endregion
 
         private System.Windows.Forms.CheckBox Box_Enabled;
-        private System.Windows.Forms.FolderBrowserDialog FolderBrowser;
         private System.Windows.Forms.CheckBox Box_CharacterName;
         private System.Windows.Forms.CheckBox Box_ShowGroup;
         private System.Windows.Forms.CheckBox Box_StayTopMost;
@@ -465,6 +464,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel3;
         private System.Windows.Forms.Panel panel4;
+        public System.Windows.Forms.FolderBrowserDialog FolderBrowser;
     }
 }
 

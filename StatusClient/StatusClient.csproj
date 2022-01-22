@@ -80,6 +80,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Classes\EsoClient.cs" />
+    <Compile Include="Classes\IProcess.cs" />
+    <Compile Include="Classes\AbstractProcess.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Discord\Discord.cs" />
     <Compile Include="Discord\DiscordRpc.cs" />
     <Compile Include="Classes\EsoCharacter.cs" />

@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
     public partial class Main : Form
     {
@@ -14,88 +14,52 @@ namespace ESO_Discord_RichPresence_Client
         public const string ESO_STEAM_APP_ID = "306130";
         public const string ADDON_NAME = "DiscordStatus";
 
-        public Settings Settings;
-        private Timer _esoTimer;
-        private Timer _closeTimer;
-        private SavedVariables _savedVars;
-        private Discord _discordClient;
-        private SteamAppIdForm _steamAppIdForm;
+        public static Settings Settings;
+        public static Timer CloseLauncherTimer;
+        public static SavedVariables SavedVars;
+        public static Discord DiscordClient;
+        public static SteamAppIdForm SteamAppIdForm;
+        public static EsoClient EsoClient;
+        public static AbstractProcess EsoLauncher = new AbstractProcess("Bethesda.net_Launcher");
 
-        public int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-        public bool EsoIsRunning { get; set; }
-        public bool EsoRanOnce { get; set; }
-        public bool JustMinimized { get; set; }
-
-        public Process EsoProcess
-        {
-            get
-            {
-                var pName = Process.GetProcessesByName("eso64");
-                return pName.Length > 0 ? pName[0] : null;
-            }
-        }
-        public Process EsoLauncherProcess
-        {
-            get
-            {
-                var pName = Process.GetProcessesByName("Bethesda.net_Launcher");
-                return pName.Length > 0 ? pName[0] : null;
-            }
-        }
+        public static int StartTimestamp { get; set; } = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+        public static bool EsoRanOnce { get; set; }
+        public static bool JustMinimized { get; set; }
 
         public Main()
         {
             InitializeComponent();
         }
 
+        /// <summary>
+        /// The entry point for this application.
+        /// </summary>
         private void Main_Load(object sender, EventArgs e)
         {
             Settings = new Settings();
 
             HandleDuplicateClient();
 
-            _discordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
-            _savedVars = new SavedVariables(this, _discordClient, FolderBrowser);
+            EsoClient = new EsoClient((string)Settings.Get("CustomSteamAppID") ?? ESO_STEAM_APP_ID, FolderBrowser);
+            EsoClient.Started += (s, x) => OnEsoStarted();
+            EsoClient.Exited += (s, x) => OnEsoExited();
+
+            DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
+            SavedVars = new SavedVariables(this);
 
             CreateSteamAppIdForm();
-            InitialiseSettings();
-            _savedVars.Initialise();
+            InitialiseClientFromSettings();
+            SavedVars.Initialise();
 
-            InitEsoTimers();
-        }
+            { // Initialise the CloseLauncher Timer, but don't start it yet
+                CloseLauncherTimer = new Timer { Interval = 1500 };
+                CloseLauncherTimer.Tick += CloseLauncherTimer_Tick;
+            }
 
-        private void InitialiseSettings()
-        {
-            Box_Enabled.Checked = (bool)Settings.Get("Enabled");
-            Box_CharacterName.Checked = (bool)Settings.Get("ShowCharacterName");
-            Box_ShowGroup.Checked = (bool)Settings.Get("ShowPartyInfo");
-            Box_ToTray.Checked = (bool)Settings.Get("ToTray");
-            Box_StayTopMost.Checked = (bool)Settings.Get("StayTopMost");
-            Box_AutoStart.Checked = (bool)Settings.Get("AutoStart");
-            Box_AutoExit.Checked = (bool)Settings.Get("AutoExit");
-            Box_CloseLauncher.Checked = (bool)Settings.Get("CloseLauncher");
-
-            if (Settings.Get("CustomSteamAppID") != null)
-                _steamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)Settings.Get("CustomSteamAppID");
-
-            if ((bool)Settings.Get("AutoStart"))
-                StartESO();
-        }
-
-        private void InitEsoTimers()
-        {
-            _esoTimer = new Timer { Interval = 1000 };
-            _esoTimer.Tick += Update_Tick;
-            _esoTimer.Start();
-
-            _closeTimer = new Timer { Interval = 1000 };
-            _closeTimer.Tick += CloseTimer_Tick;
-        }
-
-        private void CloseTimer_Tick(object sender, EventArgs e)
-        {
-            _closeTimer.Stop();
-            EsoLauncherProcess?.Kill();
+            if (EsoClient.Exists)
+                OnEsoStarted();
+            else
+                OnEsoExited();
         }
 
         private void HandleDuplicateClient()
@@ -111,97 +75,110 @@ namespace ESO_Discord_RichPresence_Client
             if (runningProcesses.Length == 1 || !(bool)Settings.Get("AutoStart"))
                 return;
 
-            StartESO();
+            EsoClient.Start();
             Application.Exit();
         }
 
         private void CreateSteamAppIdForm()
         {
-            _steamAppIdForm = new SteamAppIdForm();
-            _steamAppIdForm.Hide();
+            SteamAppIdForm = new SteamAppIdForm();
+            SteamAppIdForm.Hide();
 
             UpdateSteamAppIdFormLocation();
-            
-            Control textBoxControl = _steamAppIdForm.Controls.Find("SteamIdTextBox", true).First();
+
+            Control textBoxControl = SteamAppIdForm.Controls.Find("SteamIdTextBox", true).First();
             textBoxControl.KeyDown += AppIdTextBox_KeyDown;
             textBoxControl.LostFocus += AppIdTextBox_LostFocus;
         }
 
         private void UpdateSteamAppIdFormLocation()
         {
-            _steamAppIdForm.Location = new Point(
-                Location.X + (Width / 2) - (_steamAppIdForm.Width / 2),
-                Location.Y + (Height / 3) - (_steamAppIdForm.Height / 2)
+            SteamAppIdForm.Location = new Point(
+                Location.X + (Width / 2) - (SteamAppIdForm.Width / 2),
+                Location.Y + (Height / 3) - (SteamAppIdForm.Height / 2)
             );
         }
 
-        private void StartESO()
+        /// <summary>
+        /// Populates the Client's checkboxes and text fields from the Settings object.
+        /// </summary>
+        private void InitialiseClientFromSettings()
         {
-            if (EsoProcess != null)
-                return;
+            Box_Enabled.Checked = (bool)Settings.Get("Enabled");
+            Box_CharacterName.Checked = (bool)Settings.Get("ShowCharacterName");
+            Box_ShowGroup.Checked = (bool)Settings.Get("ShowPartyInfo");
+            Box_ToTray.Checked = (bool)Settings.Get("ToTray");
+            Box_StayTopMost.Checked = (bool)Settings.Get("StayTopMost");
+            Box_AutoStart.Checked = (bool)Settings.Get("AutoStart");
+            Box_AutoExit.Checked = (bool)Settings.Get("AutoExit");
+            Box_CloseLauncher.Checked = (bool)Settings.Get("CloseLauncher");
 
-            if (Settings.Get("CustomSteamAppID") != null && Settings.Get("CustomSteamAppID").ToString().Length >= 5)
+            if (Settings.Get("CustomSteamAppID") != null)
+                SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0].Text = (string)Settings.Get("CustomSteamAppID");
+
+            if ((bool)Settings.Get("AutoStart"))
+                EsoClient.Start();
+        }
+
+        private static void CloseLauncherTimer_Tick(object sender, EventArgs e)
+        {
+            CloseLauncherTimer.Stop();
+            EsoLauncher.Process?.Kill();
+        }
+
+        private void OnEsoStarted()
+        {
+            if (!SavedVariables.Exists)
             {
-                Process.Start($"steam://rungameid/{(string)Settings.Get("CustomSteamAppID")}");
-                return;
-            }
-
-            const string steamBaseKey = "SOFTWARE\\WOW6432Node\\Valve\\Steam";
-            const string esoBaseKey = "SOFTWARE\\WOW6432Node\\Zenimax_Online\\Launcher";
-
-            RegistryKey steamRegistryKey = Registry.LocalMachine.OpenSubKey(steamBaseKey);
-            RegistryKey esoRegistryKey;
-
-            // Steam is installed
-            if (steamRegistryKey != null)
-            {
-                string steamEsoBaseKey = $"{steamBaseKey}\\Apps\\{ESO_STEAM_APP_ID}";
-                esoRegistryKey = Registry.LocalMachine.OpenSubKey(steamEsoBaseKey);
-
-                // ESO is installed through Steam
-                if (esoRegistryKey != null)
-                {
-                    Process.Start($"steam://rungameid/{ESO_STEAM_APP_ID}");
-                    return;
-                }
-            }
-
-            esoRegistryKey = Registry.LocalMachine.OpenSubKey(esoBaseKey);
-            string esoInstallLocation;
-
-            // ESO cannot be found
-            if (esoRegistryKey == null)
-            {
-                DialogResult response = MessageBox.Show("ESO could not be found. Please select your ESO folder.", "ESO not found", MessageBoxButtons.OKCancel, MessageBoxIcon.Warning, MessageBoxDefaultButton.Button1);
-
-                if (response == DialogResult.Cancel)
-                    return;
-
-                if (FolderBrowser.ShowDialog() == DialogResult.OK)
-                {
-                    esoInstallLocation = FolderBrowser.SelectedPath;
-                    Settings.Set("CustomEsoInstallLocation", FolderBrowser.SelectedPath);
-                }
-                else
-                    return;
-            }
-
-            // ESO is installed
-            else
-                esoInstallLocation = (string)esoRegistryKey.GetValue("InstallPath");
-
-            string esoLauncherPath = $"{esoInstallLocation}\\Launcher\\Bethesda.net_Launcher.exe";
-            if (!File.Exists(esoLauncherPath))
-            {
-                MessageBox.Show("ESO could not be found. Please make sure ESO is installed correctly, then try again.", "ESO not found", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1);
+                UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
                 return;
             }
-            
-            Process.Start(new ProcessStartInfo
+
+            EsoRanOnce = true;
+
+            PlayButton.Enabled = false;
+            StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+
+            DiscordClient.Enable();
+            DiscordClient.UpdatePresence();
+
+            if ((bool)Settings.Get("CloseLauncher"))
             {
-                FileName = esoLauncherPath,
-                WorkingDirectory = $"{esoInstallLocation}\\Launcher"
-            });
+                // Close the launcher after 1.5 seconds
+                CloseLauncherTimer.Start();
+            }
+
+            // Minimise the Client if it's not already minimized
+            if (!JustMinimized)
+            {
+                JustMinimized = true;
+                Minimize();
+            }
+
+            UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
+
+            TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = false;
+        }
+
+        private void OnEsoExited()
+        {
+            if (!SavedVariables.Exists)
+            {
+                UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
+                return;
+            }
+
+            PlayButton.Enabled = true;
+            DiscordClient.Disable();
+
+            if ((bool)Settings.Get("AutoExit") && EsoRanOnce)
+                Application.Exit();
+
+            JustMinimized = false;
+
+            UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
+
+            TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = true;
         }
 
         public void UpdateStatusField(string status, Color newColor, FontStyle style = FontStyle.Regular)
@@ -223,64 +200,6 @@ namespace ESO_Discord_RichPresence_Client
             }
         }
 
-        private void Update_Tick(object sender, EventArgs e)
-        {
-            if (!SavedVariables.Exists)
-            {
-                UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod, FontStyle.Bold);
-                return;
-            }
-
-            bool processExists = EsoProcess != null;
-            if (processExists && !EsoIsRunning)
-            {
-                EsoIsRunning = true;
-                _discordClient.Enable();
-
-                StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-                _discordClient.UpdatePresence();
-
-                PlayButton.Enabled = false;
-            }
-            else if (!processExists && EsoIsRunning || !processExists)
-            {
-                EsoIsRunning = false;
-                _discordClient.Disable();
-
-                PlayButton.Enabled = EsoLauncherProcess == null;
-            }
-
-            if (EsoIsRunning)
-            {
-                EsoRanOnce = true;
-
-                if ((bool)Settings.Get("CloseLauncher"))
-                {
-                    // Close the launcher after 1 second
-                    _closeTimer.Start();
-                }
-
-                if (!JustMinimized)
-                {
-                    JustMinimized = true;
-                    Minimize();
-                }
-
-                UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
-            }
-            else
-            {
-                if ((bool)Settings.Get("AutoExit") && EsoRanOnce)
-                    Application.Exit();
-
-                JustMinimized = false;
-
-                UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
-            }
-
-            TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = !EsoIsRunning;
-        }
-
         public void InstallAddon()
         {
             string addonDirectory = $@"{SavedVariables.EsoPath}\live\AddOns\{ADDON_NAME}";
@@ -298,12 +217,12 @@ namespace ESO_Discord_RichPresence_Client
         {
             if (Box_Enabled.Checked && !(bool)Settings.Get("Enabled") && Discord.CurrentCharacter != null)
             {
-                _discordClient.Enable();
-                _discordClient.UpdatePresence();
+                DiscordClient.Enable();
+                DiscordClient.UpdatePresence();
             }
 
             else if (!Box_Enabled.Checked && (bool)Settings.Get("Enabled") && Discord.CurrentCharacter != null)
-                _discordClient.Disable();
+                DiscordClient.Disable();
 
             Settings.Set("Enabled", Box_Enabled.Checked);
         }
@@ -312,14 +231,14 @@ namespace ESO_Discord_RichPresence_Client
         {
             Settings.Set("ShowCharacterName", Box_CharacterName.Checked);
             if (Discord.CurrentCharacter != null)
-                _discordClient.UpdatePresence();
+                DiscordClient.UpdatePresence();
         }
 
         private void Box_ShowGroup_CheckedChanged(object sender, EventArgs e)
         {
             Settings.Set("ShowPartyInfo", Box_ShowGroup.Checked);
             if (Discord.CurrentCharacter != null)
-                _discordClient.UpdatePresence();
+                DiscordClient.UpdatePresence();
         }
 
         private void Box_ToTray_CheckedChanged(object sender, EventArgs e)
@@ -382,7 +301,7 @@ namespace ESO_Discord_RichPresence_Client
 
             TopMost = false;
             UpdateSteamAppIdFormLocation();
-            _steamAppIdForm.Show();
+            SteamAppIdForm.Show();
         }
 
         private void AppIdTextBox_KeyDown(object sender, KeyEventArgs e)
@@ -390,25 +309,25 @@ namespace ESO_Discord_RichPresence_Client
             if (e.KeyData != Keys.Enter)
                 return;
 
-            Control steamIdTextBox = _steamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
+            Control steamIdTextBox = SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
             Settings.Set("CustomSteamAppID", steamIdTextBox.Text);
 
             TopMost = (bool)Settings.Get("StayTopMost");
-            _steamAppIdForm.Hide();
+            SteamAppIdForm.Hide();
         }
 
         private void AppIdTextBox_LostFocus(object sender, EventArgs e)
         {
-            Control steamIdTextBox = _steamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
+            Control steamIdTextBox = SteamAppIdForm.Controls.Find("SteamIdTextBox", true)[0];
             Settings.Set("CustomSteamAppID", steamIdTextBox.Text);
 
             TopMost = (bool)Settings.Get("StayTopMost");
-            _steamAppIdForm.Hide();
+            SteamAppIdForm.Hide();
         }
 
-        private void PlayButton_Click(object sender, EventArgs e) => StartESO();
+        private void PlayButton_Click(object sender, EventArgs e) => EsoClient.Start();
 
-        private void ResetButton_Click(object sender, EventArgs e) => _savedVars.Reset();
+        private void ResetButton_Click(object sender, EventArgs e) => SavedVars.Reset();
 
         #endregion Settings Changes
 
@@ -441,7 +360,7 @@ namespace ESO_Discord_RichPresence_Client
 
         private void QuitToolStripMenuItem_Click(object sender, EventArgs e) => Application.Exit();
 
-        private void StartEsoToolStripMenuItem_Click(object sender, EventArgs e) => StartESO();
+        private void StartEsoToolStripMenuItem_Click(object sender, EventArgs e) => EsoClient.Start();
 
         #endregion Tray Context Menu
 

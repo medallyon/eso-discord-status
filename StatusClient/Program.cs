@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
     static class Program
     {

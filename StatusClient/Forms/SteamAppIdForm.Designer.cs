@@ -1,4 +1,4 @@
-﻿namespace ESO_Discord_RichPresence_Client
+﻿namespace DiscordStatus
 {
     partial class SteamAppIdForm
     {

@@ -2,7 +2,7 @@
 using System.IO;
 using System.Text;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
     class UnpackAddonFiles
     {

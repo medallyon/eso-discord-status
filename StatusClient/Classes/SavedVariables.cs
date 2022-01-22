@@ -11,11 +11,12 @@ using System.Windows.Forms;
 using NLua;
 using NLua.Exceptions;
 
-namespace ESO_Discord_RichPresence_Client
+namespace DiscordStatus
 {
-    internal class SavedVariables
+    public class SavedVariables
     {
         public static bool Exists;
+        public static LuaTable Parsed;
 
         public static string EsoPath { get; set; }
 
@@ -23,55 +24,48 @@ namespace ESO_Discord_RichPresence_Client
         public static DirectoryInfo SavedVarsDir => new DirectoryInfo($@"{EsoPath}\live\SavedVariables");
         public FileInfo SavedVarsFile => new FileInfo($@"{SavedVarsDir.FullName}\{Main.ADDON_NAME}.lua");
 
-        private readonly FolderBrowserDialog _browser;
-        private readonly Discord _client;
         private readonly FileSystemWatcher _watcher;
+        private static readonly Lua LuaClient = new Lua();
 
-        internal readonly Main Main;
+        internal readonly Main MainInstance;
 
-        public SavedVariables(Main form, Discord client, FolderBrowserDialog browser)
+        public SavedVariables(Main form)
         {
-            Main = form;
-            _client = client;
-            _browser = browser;
+            MainInstance = form;
             _watcher = new FileSystemWatcher();
         }
 
         public static EsoCharacter ParseLua(string luaTable)
         {
-            using (Lua luaClient = new Lua())
+            try
             {
-                luaClient.State.Encoding = Encoding.UTF8;
-
-                try
-                {
-                    luaClient.DoString(luaTable);
-                }
-
-                catch (LuaException error)
-                {
-                    DialogResult luaErrorResponse =
-                        MessageBox.Show($"Something went wrong while reading data from ESO: {error.Message}", "Error",
-                            MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
-
-                    if (luaErrorResponse == DialogResult.Retry)
-                        ParseLua(luaTable);
-                    else if (luaErrorResponse == DialogResult.Abort)
-                        Application.Exit();
-                }
-
-                LuaTable rootTable = luaClient.GetTable($"{Main.ADDON_NAME}_SavedVars");
-                LuaTable defaultTable = (LuaTable) rootTable["Default"];
-
-                var accounts = new Dictionary<object, LuaTable>();
-                foreach (object key in defaultTable.Keys)
-                {
-                    LuaTable value = (LuaTable) defaultTable[key];
-                    accounts.Add(key, value);
-                }
-
-                return new EsoCharacter((LuaTable) accounts.Values.First()["$AccountWide"]);
+                LuaClient.DoString(luaTable);
             }
+
+            catch (LuaException error)
+            {
+                DialogResult luaErrorResponse =
+                    MessageBox.Show($"Something went wrong while reading data from ESO: {error.Message}", "Error",
+                        MessageBoxButtons.AbortRetryIgnore, MessageBoxIcon.Error, MessageBoxDefaultButton.Button2);
+
+                if (luaErrorResponse == DialogResult.Retry)
+                    ParseLua(luaTable);
+                else if (luaErrorResponse == DialogResult.Abort)
+                    Application.Exit();
+            }
+
+            LuaTable rootTable = LuaClient.GetTable($"{Main.ADDON_NAME}_SavedVars");
+            LuaTable defaultTable = (LuaTable) rootTable["Default"];
+
+            var accounts = new Dictionary<object, LuaTable>();
+            foreach (object key in defaultTable.Keys)
+            {
+                LuaTable value = (LuaTable) defaultTable[key];
+                accounts.Add(key, value);
+            }
+
+            Parsed = (LuaTable)accounts.Values.First()["$AccountWide"];
+            return new EsoCharacter(Parsed);
         }
 
         public static DirectoryInfo GetParentEsoDir(string selectedPath)
@@ -98,6 +92,7 @@ namespace ESO_Discord_RichPresence_Client
             if (!Exists)
                 return;
 
+            LuaClient.State.Encoding = Encoding.UTF8;
             string luaContents = File.ReadAllText(SavedVarsFile.FullName);
             Discord.CurrentCharacter = ParseLua(luaContents);
         }
@@ -126,10 +121,10 @@ namespace ESO_Discord_RichPresence_Client
                     if (response == DialogResult.OK)
                     {
                         // User selected a custom directory
-                        if (_browser.ShowDialog() == DialogResult.OK)
+                        if (MainInstance.FolderBrowser.ShowDialog() == DialogResult.OK)
                         {
                             // If the selected path is not part of "My Documents/Elder Scrolls Online", keep showing the dialog
-                            while (GetParentEsoDir(_browser.SelectedPath) == null)
+                            while (GetParentEsoDir(MainInstance.FolderBrowser.SelectedPath) == null)
                             {
                                 response = MessageBox.Show(@"The Directory you selected is not part of your Documents. Please Try again.",
                                     "Directory Mismatch", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation,
@@ -137,7 +132,7 @@ namespace ESO_Discord_RichPresence_Client
 
                                 if (response == DialogResult.OK)
                                 {
-                                    if (_browser.ShowDialog() != DialogResult.OK)
+                                    if (MainInstance.FolderBrowser.ShowDialog() != DialogResult.OK)
                                         Environment.Exit(1);
                                 }
                                 else
@@ -146,7 +141,7 @@ namespace ESO_Discord_RichPresence_Client
                                 }
                             }
 
-                            EsoPath = GetParentEsoDir(_browser.SelectedPath).FullName;
+                            EsoPath = GetParentEsoDir(MainInstance.FolderBrowser.SelectedPath).FullName;
                             Main.Settings.Set("CustomEsoLocation", EsoPath);
                         }
                         else
@@ -174,7 +169,7 @@ namespace ESO_Discord_RichPresence_Client
 
                     if (addonResponse == DialogResult.OK)
                     {
-                        Main.InstallAddon();
+                        MainInstance.InstallAddon();
                         EnsureSavedVarsExist();
                     }
                     else
@@ -186,10 +181,10 @@ namespace ESO_Discord_RichPresence_Client
                 else
                 {
                     // Ensure that the AddOn is up-to-date.
-                    Main.InstallAddon();
+                    MainInstance.InstallAddon();
 
                     Exists = false;
-                    Main.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod,
+                    MainInstance.UpdateStatusField("Type '/reloadui' into the ESO chat box, then wait.", Color.Goldenrod,
                         FontStyle.Bold);
                 }
             }
@@ -241,8 +236,7 @@ namespace ESO_Discord_RichPresence_Client
             {
                 string luaCharacter = File.ReadAllText(e.FullPath);
                 Discord.CurrentCharacter = ParseLua(luaCharacter);
-                _client.Enable();
-                _client.UpdatePresence(Discord.CurrentCharacter);
+                Main.DiscordClient.UpdatePresence();
             }
 
             catch (IOException error)
@@ -262,7 +256,7 @@ namespace ESO_Discord_RichPresence_Client
         {
             Console.WriteLine("SavedVariables file deleted");
             Exists = false;
-            _client.Disable();
+            Main.DiscordClient.Disable();
 
             EnsureSavedVarsExist();
         }
@@ -271,7 +265,7 @@ namespace ESO_Discord_RichPresence_Client
         {
             Console.WriteLine("SavedVariables file renamed");
             Exists = false;
-            _client.Disable();
+            Main.DiscordClient.Disable();
 
             EnsureSavedVarsExist();
         }

@@ -135,12 +135,11 @@ namespace DiscordStatus
             }
 
             EsoRanOnce = true;
-
-            PlayButton.Enabled = false;
             StartTimestamp = (int)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
 
             DiscordClient.Enable();
             DiscordClient.UpdatePresence();
+            UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
 
             if ((bool)Settings.Get("CloseLauncher"))
             {
@@ -155,8 +154,7 @@ namespace DiscordStatus
                 Minimize();
             }
 
-            UpdateStatusField("ESO is running!\nYour status is being updated.", Color.LimeGreen);
-
+            PlayButton.Enabled = false;
             TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = false;
         }
 
@@ -168,16 +166,18 @@ namespace DiscordStatus
                 return;
             }
 
-            PlayButton.Enabled = true;
             DiscordClient.Disable();
+            UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
 
             if ((bool)Settings.Get("AutoExit") && EsoRanOnce)
+            {
                 Application.Exit();
+                return;
+            }
 
             JustMinimized = false;
 
-            UpdateStatusField("ESO isn't running!\nYour status won't be updated.", Color.Firebrick);
-
+            PlayButton.Enabled = true;
             TrayContextMenu.Items["startEsoToolStripMenuItem"].Enabled = true;
         }
 

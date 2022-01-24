@@ -34,7 +34,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>D:\Medallyon\Documents\Elder Scrolls Online\live\AddOns\DiscordStatus\Client\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -153,13 +153,13 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
-      xcopy /s /y "..\..\..\packages\NLua.1.5.9\lib\net46\*.*" "$(TargetDir)"
-      xcopy /s /y "..\..\..\packages\win32-dynamic\*.*" "$(TargetDir)win32-dynamic\"
-    </PostBuildEvent>
+      xcopy /s /y "$(SolutionDir)packages\NLua.1.5.9\lib\net46\*.*" "$(TargetDir)"
+      xcopy /s /y "$(SolutionDir)packages\win32-dynamic\*.*" "$(TargetDir)win32-dynamic\"
+</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>echo "Packaging AddOn directory..."
-"$(SolutionDir)PackAddonFiles\$(OutDir)PackAddonFiles.exe" "$(SolutionDir)AddOn" "$(ProjectDir)ADDON.PAF"</PreBuildEvent>
+"$(SolutionDir)PackAddonFiles\bin\$(Configuration)\PackAddonFiles.exe" "$(SolutionDir)AddOn" "$(ProjectDir)ADDON.PAF"</PreBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\KeraLua.1.2.14\build\net46\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.2.14\build\net46\KeraLua.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

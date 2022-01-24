@@ -6,7 +6,7 @@ DS.name = "DiscordStatus"
 DS.meta = {
     name = "Discord Status",
     author = "Medallyon#5012",
-    version = "1.0.0",
+    version = "1.0.1",
     website = "https://www.esoui.com/downloads/info2054-DiscordStatusUpdater.html"
 }
 

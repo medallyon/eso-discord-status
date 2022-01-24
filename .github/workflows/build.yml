@@ -90,3 +90,4 @@ jobs:
         readme: "Resources/description.md"
         changelog: "Resources/changelog.txt"
         artifact: "dist/DiscordStatus-v${{ github.ref_name }}.zip"
+        dryRun: false

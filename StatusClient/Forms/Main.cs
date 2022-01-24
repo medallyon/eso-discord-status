@@ -203,10 +203,11 @@ namespace DiscordStatus
         public void InstallAddon()
         {
             string addonDirectory = $@"{SavedVariables.EsoPath}\live\AddOns\{ADDON_NAME}";
+            DirectoryInfo addonDir = new DirectoryInfo(addonDirectory);
 
-            if (Directory.Exists(addonDirectory))
-                Directory.Delete(addonDirectory, true);
-            Directory.CreateDirectory(addonDirectory);
+            addonDir.Create();
+            foreach (FileInfo file in addonDir.GetFiles())
+                file.Delete();
 
             UnpackAddonFiles.Unpack(addonDirectory);
         }

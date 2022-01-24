@@ -1,3 +1,5 @@
+24-01-2022: Fix a bug that made the Client unusable
+
 22-01-2022: Client event-driven rewrite for better performance 
 
 16-01-2022: Make automatic ESO Documents detection smarter

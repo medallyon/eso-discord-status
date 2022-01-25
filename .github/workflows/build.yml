@@ -82,7 +82,7 @@ jobs:
 
     # Upload the package zip to ESOUI
     - name: Push to ESOUI
-      uses: Medallyon/Push-To-EsoUI@v2.0.0
+      uses: Medallyon/Push-To-EsoUI@v2.0.1
       with:
         EsoUIToken: ${{ secrets.ESOUI_TOKEN }}
         ESOUIID: 2054

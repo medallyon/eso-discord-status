@@ -72,7 +72,7 @@ jobs:
 
     # Upload the package zip to ESOUI
     - name: Push to ESOUI
-      uses: Medallyon/Push-To-EsoUI@v2.0.0
+      uses: Medallyon/Push-To-EsoUI@v2.0.1
       env:
         version: ${{ github.event.inputs.version }}
       with:

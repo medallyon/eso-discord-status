@@ -38,8 +38,6 @@ namespace DiscordStatus
         {
             Settings = new Settings();
 
-            HandleDuplicateClient();
-
             EsoClient = new EsoClient((string)Settings.Get("CustomSteamAppID") ?? ESO_STEAM_APP_ID, FolderBrowser);
             EsoClient.Started += (s, x) => OnEsoStarted();
             EsoClient.Exited += (s, x) => OnEsoExited();
@@ -47,6 +45,7 @@ namespace DiscordStatus
             DiscordClient = new Discord(this, DISCORD_CLIENT_ID, ESO_STEAM_APP_ID);
             SavedVars = new SavedVariables(this);
 
+            HandleDuplicateClient();
             CreateSteamAppIdForm();
             InitialiseClientFromSettings();
             SavedVars.Initialise();

@@ -3,7 +3,7 @@ By using this Addon, your status on Discord will change to display Rich Presence
 
 This AddOn comes attached with an executable Client, which is necessary to update your status on Discord. It's the same as how [url=http://www.esoui.com/downloads/info1245-TamrielTradeCentre.html]Tamriel Trade Centre[/url], for example, handles its data.
 
-Here's a small guide to get the addon working:[list=1][*]Install this addon[*]Start Discord[*]Start ESO[*]Start the Addon Client, found in the Client folder that comes with the Addon[*](Optional) Configure the Addon by typing '﻿﻿[b]/drp[/b]' into the in-game chat[*](Optional) Create a shortcut on your desktop for the Addon Client[/list]
+Here's a small guide to get the addon working:[list=1][*]Install this addon[*]Start Discord[*]Start ESO[*]Start the Addon Client, found in the Client folder that comes with the Addon[*](Optional) Configure the Addon by typing '[b]/ds[/b]' into the in-game chat[*](Optional) Create a shortcut on your desktop for the Addon Client[/list]
 
 The Addon Client might get flagged by your Anti-Virus program (Windows Defender, Malwarebytes, Avast, etc.). If that's the case, add the program to your exceptions. If you are wary of my program, I completely understand. If you would rather build your own client, visit the [url=https://github.com/Medallyon/eso-discord-rich-presence-client]project repo[/url] and follow the steps there.
 

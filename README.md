@@ -12,7 +12,7 @@ This little program is made using the .Net 4.6.1 framework and sends Rich Presen
 
 ### Normal Method
 
-This program currently only supports Windows. Visit the [Releases](https://github.com/Medallyon/eso-discord-rich-presence-client/releases) page to view the latest release and install it. Make sure you install it into the correct folder (which should be `My Documents/Elder Scrolls Online/AddOns/`).
+This program currently only supports Windows. Download `Discord Status` from Minion or visit the [Releases](https://github.com/Medallyon/eso-discord-rich-presence-client/releases) page to view the latest release and install it. Make sure you install it into the correct folder (which should be `My Documents/Elder Scrolls Online/AddOns/`).
 
 ### Compiling Yourself
 
@@ -38,7 +38,7 @@ This program currently only supports Windows. Visit the [Releases](https://githu
 2. Start Discord
 3. Start ESO
 4. Start the Addon Client, found in the Client folder that comes with the Addon
-5. (Optional) Configure the Addon by typing `/drp` into the in-game chat
+5. (Optional) Configure the Addon by typing `/ds` into the in-game chat
 6. (Optional) Create a shortcut on your desktop for the Addon Client
 
 ## Troubleshooting
@@ -46,7 +46,7 @@ This program currently only supports Windows. Visit the [Releases](https://githu
 + **The files immediately disappear when I unzip the addon to the Addons folder**
   + This is most likely because of an anti-virus program (Windows Defender, Malwarebytes, Avast, etc.). Create an exception for the unzipped folder along with the Client to stop this issue.
 + **I get an Error: `The target directory is not empty.`**
-  + Remove the Addon folder `DiscordRichPresence` and try installing the addon again.
+  + Remove the Addon folder `DiscordStatus` and try installing the addon again.
   + If the error persists, move the Client folder to your desktop, remove the Addon folder, and then try running the Client
 
 ## Contributing
